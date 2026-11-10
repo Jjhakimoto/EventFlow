@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Events</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Events">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#fafaf8">
+
+<style>
+:root{--bg:#fafaf8;--card:#fff;--tx:#1b1b1a;--mu:#76756f;--ln:#e6e5e0;--ac:#1b1b1a;--ok:#2f7d4f;--wa:#b7791f;--bad:#c0392b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161615;--card:#1f1f1e;--tx:#ededea;--mu:#9a9992;--ln:#313130;--ac:#ededea;--ok:#5fbf86;--wa:#e0a84a;--bad:#ef7a6c}}
+:root[data-theme="dark"]{--bg:#161615;--card:#1f1f1e;--tx:#ededea;--mu:#9a9992;--ln:#313130;--ac:#ededea;--ok:#5fbf86;--wa:#e0a84a;--bad:#ef7a6c}
+*{box-sizing:border-box}html{color-scheme:light dark}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;padding-bottom:130px}
+main{max-width:640px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:4px 0 14px;font-weight:600}h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--mu);margin:20px 0 8px;font-weight:600}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:12px;margin-bottom:8px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}.mu{color:var(--mu);font-size:13px}
+.sw{position:relative;overflow:hidden;border-radius:12px;margin-bottom:8px}.sw .card{margin:0;position:relative;transition:transform .2s;touch-action:pan-y;user-select:none;-webkit-user-select:none}.swa{visibility:hidden;position:absolute;right:0;top:0;bottom:0;display:flex}.sw.on .swa{visibility:visible}.swa button{width:80px;border:0;border-radius:0;font-size:13px;background:var(--ln);color:var(--tx)}.swa button.d{background:var(--bad);color:#fff}
+.sheet.big{width:min(760px,94vw);max-width:none;padding:12px}.dvf{display:block;width:100%;height:60vh;border:0;border-radius:8px;background:#fff}.dvs{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;margin:8px 0;font-size:13px}.dvs b{font-weight:600}.dvb{display:flex;gap:8px}.dvb button{flex:1;padding:7px 4px;font-size:13px;white-space:nowrap}.dvb a{color:inherit}.sheet.wide{left:auto;right:24px;transform:translateY(-50%);width:480px}
+.pdfp{position:fixed;left:24px;top:24px;bottom:24px;right:540px;z-index:6;background:var(--card);border:1px solid var(--ln);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.pdfo{position:fixed;left:12px;right:12px;top:12px;bottom:12px;z-index:7;background:var(--card);border:1px solid var(--ln);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.pdfp iframe,.pdfo iframe{flex:1;border:0;width:100%;background:#fff}
+html,body{overscroll-behavior-y:contain}
+.chip{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--ln);color:var(--mu);white-space:nowrap}
+.ok{color:var(--ok);border-color:var(--ok)}.wa{color:var(--wa);border-color:var(--wa)}.bad{color:var(--bad);border-color:var(--bad)}
+input,select{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:8px;min-width:0;width:100%}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.f label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
+button{font:inherit;border:1px solid var(--ln);background:var(--card);color:var(--tx);border-radius:8px;padding:8px 12px;cursor:pointer}
+button.p{background:var(--ac);color:var(--bg);border-color:var(--ac)}button.x{padding:2px 8px;color:var(--mu)}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--ln);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;border:0;border-radius:0;background:none;padding:12px 2px;font-size:11px;color:var(--mu)}nav button.on{color:var(--tx);font-weight:600}
+.warn{color:var(--bad);font-size:13px;margin-top:4px}
+.sum{display:grid;grid-template-columns:1fr auto;gap:4px 12px}.sum b{text-align:right}
+.big{font-size:22px;font-weight:600}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px 4px;text-align:right;border-bottom:1px solid var(--ln);white-space:nowrap}td:first-child,th:first-child{text-align:left}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(62px + env(safe-area-inset-bottom,0px));width:52px;height:52px;border-radius:50%;background:var(--ac);color:var(--bg);font-size:30px;line-height:1;padding:0;border:0;box-shadow:0 2px 10px rgba(0,0,0,.25);z-index:4}
+.bd{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:5}
+.sheet{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:6;width:calc(100% - 32px);max-width:480px;background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:16px;max-height:85vh;max-height:calc(100dvh - 48px);overflow:auto;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+select.ph{color:var(--mu)}
+.bdd{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8}.dlg{position:fixed;left:16px;right:16px;top:50%;transform:translateY(-50%);max-width:420px;margin:0 auto;z-index:9;background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:16px}button.dng{background:var(--bad);border-color:var(--bad);color:#fff}option{color:var(--tx)}
+
+:root{--eq:#3b6fd4;--cr:#d9822b;--pt:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--eq:#6c9bf0;--cr:#f0a35b;--pt:#161615}}
+:root[data-theme="dark"]{--eq:#6c9bf0;--cr:#f0a35b;--pt:#161615}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.wd{font-size:11px;color:var(--mu);text-align:center;padding:2px 0}
+.cd{min-height:66px;display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:3px;border-radius:8px;text-align:left;font-size:12px;overflow:hidden}
+.cd .dn{font-size:12px;font-weight:600;line-height:18px;min-width:18px;align-self:flex-start;padding:0 4px}
+.cd.td .dn{background:var(--ac);color:var(--bg);border-radius:99px}
+.cd.sel{border:2px solid var(--ac);padding:2px}.cd.cl{border-color:var(--bad)}.cd.cl.sel{border-color:var(--bad);box-shadow:0 0 0 1px var(--ac)}
+.cd.em{visibility:hidden}
+.pl{font-size:10px;line-height:14px;border-radius:4px;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:clip;color:var(--pt)}
+.pl.eq{background:var(--eq)}.pl.cr{background:var(--cr)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:baseline}.dot.eq{background:var(--eq)}.dot.cr{background:var(--cr)}.dot.cl{background:var(--bad)}
+.fd{margin-top:2px}.fd summary{cursor:pointer;color:var(--mu);font-size:13px;padding:6px 2px;list-style:none}.fd summary::-webkit-details-marker{display:none}.fd summary::before{content:'▸ '}.fd[open] summary::before{content:'▾ '}.fd .free{opacity:1}
+.eqc{border-left:4px solid var(--eq)}.crc{border-left:4px solid var(--cr)}.free{opacity:.55}
+
+:root{--c-sound:#7c5cdb;--c-light:#c4429a;--c-visual:#1f9d8a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--c-sound:#a78bfa;--c-light:#e07fc0;--c-visual:#4cc9b5}}
+:root[data-theme="dark"]{--c-sound:#a78bfa;--c-light:#e07fc0;--c-visual:#4cc9b5}
+.tcard{border-left:4px solid var(--tc)}.chip.tc{color:var(--tc);border-color:var(--tc)}
+</style></head><body><main id="app"></main>
+<nav id="nav"></nav><input type="file" id="docf" accept="application/pdf" hidden onchange="readDoc(this.files[0])"><div id="ptr" style="display:none;position:fixed;left:50%;top:10px;transform:translateX(-50%);background:var(--card);border:1px solid var(--ln);color:var(--tx);padding:6px 14px;border-radius:99px;font-size:13px;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,.15)"></div><div id="toast" style="display:none;position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ac);color:var(--bg);padding:10px 14px;border-radius:10px;font-size:14px;z-index:20;max-width:calc(100% - 32px);text-align:center"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+const d0=n=>{const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+let S={gear:[
+{id:1,name:'Speaker (powered, 12")',qty:4,own:'owned',rate:40,cost:0},
+{id:2,name:'Mixer (WING)',qty:1,own:'owned',rate:150,cost:0},
+{id:3,name:'LED par',qty:12,own:'owned',rate:12,cost:0},
+{id:4,name:'Moving head',qty:6,own:'out',rate:60,cost:35}],
+crew:[{id:1,name:'Crew A',op:18,rig:12},{id:2,name:'Crew B',op:22,rig:14}],
+jobs:[
+{id:1,client:'Sample wedding',event:'Reception',date:d0(5),status:'Confirmed',labour:300,lines:[{g:1,q:3},{g:2,q:1},{g:4,q:2}],shifts:[{c:1,role:'rig',h:3},{c:2,role:'op',h:6}]},
+{id:2,client:'Sample corporate',event:'Conference',date:d0(5),status:'Quoted',labour:200,lines:[{g:1,q:2},{g:3,q:8}],shifts:[{c:1,role:'op',h:5}]}]};
+let V={tab:'home',job:null,date:d0(5),edit:'',add:false,pop:null,del:null,selCrew:null,selTask:null,cf:'all',av:'cal',cm:'',ea:null,pf:false,gs:'type',gd:1,cs:'az',cd:1};
+try{const x=localStorage.getItem('evtapp');if(x)S=JSON.parse(x)}catch(e){}
+const save=()=>{try{localStorage.setItem('evtapp',JSON.stringify(S))}catch(e){}};
+S.jobs.forEach(j=>{if(j.quote==null){j.quote=j.lines.reduce((a,l)=>a+(S.gear.find(g=>g.id==l.g)||{rate:0}).rate*l.q,0)+(+j.labour||0);j.vat='excl';j.vatRate=18}});
+S.jobs.forEach(j=>{if(!j.tasks)j.tasks=(j.shifts&&j.shifts.length)?[{id:1,name:'Crew',price:0,assign:j.shifts.map(s=>({c:s.c,role:s.role,h:s.h}))}]:[]});
+S.jobs.forEach(j=>{const dq=(j.docs&&j.docs.quote&&/^\d{4}-\d\d-\d\d$/.test(j.docs.quote.date||'')?j.docs.quote.date:null),di=(j.docs&&j.docs.invoice&&/^\d{4}-\d\d-\d\d$/.test(j.docs.invoice.date||'')?j.docs.invoice.date:null);if(j.status=='Quoted'&&!j.qDate)j.qDate=dq||new Date().toISOString().slice(0,10);if(j.status=='Invoiced'&&!j.iDate)j.iDate=di||new Date().toISOString().slice(0,10)});
+if(!S.alias)S.alias={};if(!S.nodup)S.nodup=[];
+if(!S.payments)S.payments=[];
+S.jobs.forEach(j=>{if(j.pays){j.pays.forEach(x=>S.payments.push({id:S.payments.reduce((m,y)=>Math.max(m,y.id),0)+1,c:x.c,amt:x.amt,date:x.date,ref:'',inv:!!x.inv,alloc:[{j:j.id,amt:x.amt}]}));delete j.pays}});
+if(!S.contacts)S.contacts=['Neolitika','Tech+','Mdina Partners','Spacelab Ltd.'].map((n,i)=>({id:i+1,name:n,isCl:true,isVe:false,phone:'',email:'',notes:''}));
+S.gear.forEach(g=>{if(g.costMode=='pct'){g.costMode='disc';g.disc=100-(+g.costPct||0);g.vprice=0}});
+const CATS=[['sound','Sound'],['light','Lighting'],['visual','Visuals']];
+S.gear.forEach(g=>{if(!g.cats)g.cats=({'Speaker (powered, 12")':['sound'],'Mixer (WING)':['sound'],'LED par':['light'],'Moving head':['light']})[g.name]||[]});
+const nid=a=>a.reduce((m,x)=>Math.max(m,x.id),0)+1;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const G=id=>S.gear.find(x=>x.id==id)||{name:'?',qty:0,rate:0,cost:0,own:'owned'};
+const C=id=>S.crew.find(x=>x.id==id)||{name:'?',op:0,rig:0};
+const jt=j=>j.event||j.client,isBk=j=>j.cat=='booking',CT=[['event','Live event'],['install','Installation'],['booking','Equipment booking']],cn=j=>(CT.find(x=>x[0]==j.cat)||CT[0])[1];
+const J=id=>S.jobs.find(x=>x.id==id);
+const m=n=>{const a=Math.round((Math.abs(+n||0)+1e-9)*100)/100;return(n<0&&a>0?'−':'')+'€'+a.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})};
+const counts=j=>j.status!=='Meeting';
+function booked(gid,date,ex){let t=0;S.jobs.forEach(j=>{if(j.id!=ex&&j.date==date&&counts(j))j.lines.forEach(l=>{if(l.g==gid&&!isOut(l))t+=l.q})});return t}
+const lr=l=>l.rate!=null&&l.rate!==''?+l.rate:G(l.g).rate;
+const isOut=l=>G(l.g).own==='out'||l.out;
+const gCost=g=>g.costMode=='disc'?(+g.vprice||+g.rate||0)*(1-(+g.disc||0)/100):(+g.cost||0);
+const gcLabel=g=>g.costMode=='disc'?m(gCost(g))+' ('+(+g.disc||0)+'% off vendor price)':m(g.cost);
+const hintTxt=g=>g.costMode=='disc'?`Vendor price ${m(+g.vprice||+g.rate||0)} − ${+g.disc||0}% = supplier cost ${m(gCost(g))}/day · your margin ${m(g.rate-gCost(g))}/day`:`Supplier cost ${m(gCost(g))}/day · your margin ${m(g.rate-gCost(g))}/day`;
+function gHint(id){const g=S.gear.find(x=>x.id==id),e=document.getElementById('gh');if(e&&g)e.textContent=hintTxt(g)}
+const unitCost=l=>G(l.g).own==='out'?gCost(G(l.g)):(l.ocost||0);
+function calc(j){let eq=0,oc=0,cc=0,hrs=0;
+j.lines.forEach(l=>{eq+=lr(l)*l.q;if(isOut(l))oc+=unitCost(l)*l.q});
+(j.tasks||[]).forEach(t=>t.assign.forEach(a=>{cc+=a.role=='fix'?(+a.amt||0):a.h*(a.role=='op'?C(a.c).op:C(a.c).rig);if(a.role!='fix')hrs+=a.h}));
+const vt=j.friend?'none':j.vat,r=+j.vatRate||0,q=+j.quote||0,rev=vt=='incl'?q/(1+r/100):q,vatAmt=vt=='incl'?q-rev:vt=='excl'?q*r/100:0,cost=oc+cc,p=rev-cost,pc=rev?p/rev*100:0;
+return{eq,oc,cc,hrs,rev,vatAmt,cost,p,pc,v:pc>=40?['Worth it','ok']:pc>=25?['Marginal','wa']:['Underpriced','bad']}}
+function go(t,j){V.edit='';V.add=false;V.pop=null;V.del=null;V.selCrew=null;V.selTask=null;V.ea=null;V.pf=false;V.tab=t;V.job=j||null;render()}
+function seedTT(){const base=['Light operator','Sound operator','Video operator','Setup','Derig','Delivery','Collection','Rigging','Technician','Driver','Stage manager','Production'];S.taskTypes=base.map((n,i)=>({id:i+1,name:n,price:0}));
+S.jobs.forEach(j=>(j.tasks||[]).forEach(t=>{const n=String(t.name||'').trim();if(n&&!S.taskTypes.some(x=>x.name.toLowerCase()==n.toLowerCase()))S.taskTypes.push({id:nid(S.taskTypes),name:n,price:0})}))}
+function pickTT(jid,tid,v){const t=J(jid).tasks.find(x=>x.id==tid),isNew=!!(V.pop&&V.pop.isNew);
+if(v=='__new'){V.pop={k:'ttnew',jid,tid,ret:{k:'task',j:jid,t:tid,isNew}};render();return}
+if(v=='cur'||!v){render();return}const x=S.taskTypes.find(y=>y.id==+v);t.name=x.name;if(!(+t.price)&&x.price)t.price=x.price;render()}
+function saveTT(){const o=V.pop,n=document.getElementById('ttn').value.trim(),pr=+document.getElementById('ttp').value||0;if(!n){document.getElementById('ttn').focus();return}
+const dup=S.taskTypes.find(x=>x.name.toLowerCase()==n.toLowerCase()&&x.id!=o.id);
+if(o.k=='ttedit'){const x=S.taskTypes.find(y=>y.id==o.id);x.name=n;x.price=pr;V.pop=null;render();return}
+let x=dup;if(!x){x={id:nid(S.taskTypes),name:n,price:pr};S.taskTypes.push(x)}
+if(o.ret&&o.tid){const t=J(o.jid).tasks.find(y=>y.id==o.tid);t.name=x.name;if(!(+t.price)&&x.price)t.price=x.price}
+V.pop=o.ret||null;render()}
+function tasksView(){const use=n=>S.jobs.reduce((a,j)=>a+(j.tasks||[]).filter(t=>String(t.name).trim().toLowerCase()==n.toLowerCase()).length,0);
+const l=S.taskTypes.slice().sort((a,b)=>a.name.localeCompare(b.name));
+return`<h1>Task list</h1><div class="mu" style="margin-bottom:10px">Tasks you usually have on jobs. Pick them from the dropdown when adding a task to a job.</div>`+(l.map(x=>`<div class="card"><div class="row"><span><b>${esc(x.name)}</b><div class="mu">${use(x.name)} use${use(x.name)==1?'':'s'} in jobs${x.price?' · default '+m(x.price):''}</div></span><span style="white-space:nowrap"><button class="x" title="Edit" onclick="V.pop={k:'ttedit',id:${x.id}};render()">✎</button><button class="x" title="Delete" onclick="askDel('tt',${x.id})">✕</button></span></div></div>`).join('')||'<div class="mu">No task types yet.</div>')+(V.pop?'':`<button class="fab" aria-label="Add task type" onclick="V.pop={k:'ttnew'};render()">+</button>`)}
+function render(){if(!S.taskTypes)seedTT();
+const T=[['home','Home'],['jobs','Jobs'],['avail','Availability'],['gear','Gear'],['menu','Menu']],inMenu=['menu','crew','pay','tasks','contacts','profit'];
+nav.innerHTML=T.map(([k,l])=>`<button class="${V.tab==k||(k=='menu'&&inMenu.includes(V.tab))?'on':''}" onclick="go('${k}')">${l}</button>`).join('');
+app.innerHTML=({tasks:tasksView,home:homeView,pay:payView,jobs:V.job?jobView:jobsView,avail:availView,gear:gearView,crew:crewView,menu:menuView,contacts:contactsView,profit:profitView})[V.tab]()+popup()+delDlg();app.querySelectorAll('input[type=number]').forEach(i=>{if(!i.getAttribute('step')){i.step='any';i.inputMode='decimal'}});save()}
+const today=()=>{const n=new Date();return n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())};
+const isUp=j=>j.date>=today()||j.status=='Meeting';
+function jobOrder(){return[...S.jobs].sort((a,b)=>{const ua=isUp(a),ub=isUp(b);if(ua!=ub)return ua?-1:1;return ua?(a.date<b.date?-1:a.date>b.date?1:0):(a.date<b.date?1:a.date>b.date?-1:0)})}
+const JV=[['list','Upcoming / completed'],['month','By month'],['client','By client'],['cat','By type'],['table','Table']];
+function jobCard(j){const c=calc(j),up=isUp(j);return`<div class="sw"><div class="swa"><button onclick="dupJob(${j.id})">Duplicate</button><button class="d" onclick="askDel('job',${j.id})">Delete</button></div><div class="card" onclick="swTap(${j.id})"><div class="row"><span><b>${esc(jt(j))}</b><div class="mu">${j.event?esc(j.client)+' · ':''}${cn(j)}</div></span>${j.friend?'<span class="chip">Friendly</span>':up?'<span class="chip">Upcoming</span>':`<span class="chip ${c.v[1]}">${c.v[0]}</span>`}</div><div class="row mu"><span>${j.date}${j.time?' '+j.time:''}${j.loc?' · '+esc(j.loc):''} · ${j.status}${j.estNo||(j.invNo&&!j.friend)?' · '+[j.estNo,j.friend?'':j.invNo].filter(Boolean).map(esc).join(' / '):''}</span><span>${j.friend||up?'':m(c.p)+' profit'}</span></div></div></div>`}
+function jobsView(){V.hd=V.hd||{};V.jv=V.jv||'list';const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],all=jobOrder();let groups=[];
+const add=(key,title,j)=>{let g=groups.find(x=>x.key==key);if(!g)groups.push(g={key,title,jobs:[]});g.jobs.push(j)};
+if(V.jv=='list')all.forEach(j=>add(String(isUp(j)),isUp(j)?'Upcoming':'Completed',j));
+else if(V.jv=='month'){[...S.jobs].sort((a,b)=>a.date<b.date?1:-1).forEach(j=>add(j.date.slice(0,7),mn[+j.date.slice(5,7)-1]+' '+j.date.slice(0,4),j))}
+else if(V.jv=='client'){[...S.jobs].sort((a,b)=>a.date<b.date?1:-1).forEach(j=>add('c'+j.client,j.client,j));groups.sort((a,b)=>a.title.localeCompare(b.title))}
+else if(V.jv=='cat'){all.forEach(j=>add('t'+cn(j),cn(j),j));groups.sort((a,b)=>CT.findIndex(x=>x[1]==a.title)-CT.findIndex(x=>x[1]==b.title))}
+let body;
+if(V.jv=='table'){body=`<div class="card scroll"><table><tr><th>Job</th><th>Date</th><th>Type</th><th>Status</th><th>Quote</th></tr>${all.map(j=>`<tr onclick="go('jobs',${j.id})"><td>${esc(jt(j))}</td><td>${j.date}</td><td>${cn(j)}</td><td>${j.status}</td><td>${m(j.quote)}</td></tr>`).join('')}</table></div>`}
+else body=groups.map(g=>`<h2 style="cursor:pointer;display:flex;justify-content:space-between" onclick="V.hd[this.dataset.k]=!V.hd[this.dataset.k];render()" data-k="${esc(V.jv+g.key)}"><span>${esc(g.title)} <span style="font-weight:400">· ${g.jobs.length}</span></span><span>${V.hd[V.jv+g.key]?'›':'⌄'}</span></h2>${V.hd[V.jv+g.key]?'':g.jobs.map(jobCard).join('')}`).join('');
+return`<div class="row" style="margin-bottom:8px"><h1 style="margin:0">Jobs</h1><select style="width:auto" onchange="V.jv=this.value;render()">${JV.map(([k,l])=>`<option value="${k}" ${V.jv==k?'selected':''}>${l}</option>`).join('')}</select></div>`+body+`<div class="f"><button onclick="pickDoc(0,'auto')" style="grid-column:1/-1">Import quote PDF</button></div><button id="jfab" class="fab" aria-label="New job" onclick="newJob()" style="transition:opacity .2s,transform .2s;${scrollY>60?'opacity:0;pointer-events:none;transform:translateX(-50%) translateY(20px)':''}">+</button>`}
+addEventListener('scroll',()=>{const f=document.getElementById('jfab');if(!f)return;const hide=scrollY>60;f.style.opacity=hide?'0':'';f.style.pointerEvents=hide?'none':'';f.style.transform=hide?'translateX(-50%) translateY(20px)':''},{passive:true});
+let PT={x:0,y:0,on:false,rd:false};
+function doRefresh(){const e=document.getElementById('ptr');e.textContent='Updating…';e.style.display='block';try{save()}catch(x){}closeSw();setTimeout(()=>{render();e.style.display='none';toast('Updated',1500)},350)}
+document.addEventListener('touchstart',e=>{PT.on=scrollY<=0&&!V.pop&&!V.del&&e.touches.length==1;PT.rd=false;if(PT.on){PT.x=e.touches[0].clientX;PT.y=e.touches[0].clientY}},{passive:true});
+document.addEventListener('touchmove',e=>{if(!PT.on)return;const t=e.touches[0],dy=t.clientY-PT.y,dx=t.clientX-PT.x;if(scrollY>0||Math.abs(dx)>Math.abs(dy)){return}const el=document.getElementById('ptr');if(dy>12){PT.rd=dy>80;el.style.display='block';el.textContent=PT.rd?'Release to refresh':'Pull to refresh';el.style.top=Math.min(60,10+dy/3)+'px'}else el.style.display='none'},{passive:true});
+document.addEventListener('touchend',()=>{if(!PT.on)return;PT.on=false;const el=document.getElementById('ptr');if(PT.rd){PT.rd=false;doRefresh()}else el.style.display='none'});
+let SW={x:0,y:0,el:null,dx:0,dir:'',open:null};
+function swTapE(k,id){if(SW.moved){SW.moved=false;return}if(SW.open){closeSw();return}openEdit({k,id})}
+function dupItem(kind,id){const arr=S[kind],o=arr.find(x=>x.id==id),c=JSON.parse(JSON.stringify(o));c.id=nid(arr);c.name=o.name+' (copy)';arr.push(c);SW.open=null;V.pop={k:kind=='gear'?'gedit':'cedit',id:c.id};render()}
+function swTap(id){if(SW.moved){SW.moved=false;return}if(SW.open){closeSw();return}go('jobs',id)}
+function closeSw(){if(SW.open){const p=SW.open.parentNode;SW.open.style.transform='';SW.open=null;setTimeout(()=>p.classList.remove('on'),220)}}
+function dupJob(id){const o=J(id),j=JSON.parse(JSON.stringify(o));j.id=nid(S.jobs);j.event=(o.event||o.client)+' (copy)';delete j.estNo;delete j.invNo;delete j.docs;delete j.pays;delete j.qDate;delete j.iDate;j.lines.forEach(l=>{delete l.ret});S.jobs.push(j);SW.open=null;go('jobs',j.id);V.pop={k:'jedit',id:j.id,isNew:true};render()}
+function swStart(e,x,y){if(e.target.closest&&e.target.closest('.swa'))return;const c=e.target.closest&&e.target.closest('.sw .card');if(!c){closeSw();return}if(SW.open&&SW.open!==c)closeSw();SW.x=x;SW.y=y;SW.el=c;SW.dx=0;SW.dir='';SW.moved=false;c.style.transition='none'}
+function swMove(x,y){if(!SW.el)return;const dx=x-SW.x,dy=y-SW.y;if(!SW.dir&&(Math.abs(dx)>8||Math.abs(dy)>8))SW.dir=Math.abs(dx)>Math.abs(dy)?'h':'v';if(SW.dir!='h')return;SW.moved=true;SW.el.parentNode.classList.add('on');const base=SW.open===SW.el?-160:0;SW.dx=Math.max(-160,Math.min(0,base+dx));SW.el.style.transform='translateX('+SW.dx+'px)'}
+function swEnd(){const c=SW.el;if(!c)return;c.style.transition='';if(SW.dir=='h'){if(SW.dx<-60){c.style.transform='translateX(-160px)';SW.open=c}else{c.style.transform='';const p=c.parentNode;setTimeout(()=>p.classList.remove('on'),220);if(SW.open===c)SW.open=null}}SW.el=null;setTimeout(()=>{SW.moved=false},350)}
+document.addEventListener('touchstart',e=>{const t=e.touches[0];swStart(e,t.clientX,t.clientY)},{passive:true});
+document.addEventListener('touchmove',e=>{const t=e.touches[0];swMove(t.clientX,t.clientY)},{passive:true});
+document.addEventListener('touchend',swEnd);document.addEventListener('touchcancel',swEnd);
+document.addEventListener('mousedown',e=>{if(e.button===0)swStart(e,e.clientX,e.clientY)});
+document.addEventListener('mousemove',e=>{if(SW.el)swMove(e.clientX,e.clientY)});
+document.addEventListener('mouseup',swEnd);
+let swW=0;document.addEventListener('wheel',e=>{const c=e.target.closest&&e.target.closest('.sw .card');if(!c||Math.abs(e.deltaX)<=Math.abs(e.deltaY))return;e.preventDefault();const t=Date.now();if(t-swW<500)return;swW=t;const p=c.parentNode;if(e.deltaX>0){if(SW.open&&SW.open!==c)closeSw();p.classList.add('on');c.style.transform='translateX(-160px)';SW.open=c}else if(SW.open===c)closeSw()},{passive:false});
+
+// ---- GitHub backup (token kept on this device only, never inside the backup) ----
+const ghCfg=()=>{try{return JSON.parse(localStorage.getItem('evtgh')||'{}')}catch(e){return{}}};
+const ghOk=()=>{const c=ghCfg();return !!(c.o&&c.r&&c.t)};
+const ghHash=t=>{let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return t.length+':'+h};
+const ghH=c=>({Authorization:'Bearer '+c.t,Accept:'application/vnd.github+json'});
+const ghU=(c,path)=>'https://api.github.com/repos/'+encodeURIComponent(c.o)+'/'+encodeURIComponent(c.r)+(path||'');
+const ghPath='evtapp-backup.json';
+function ghMsg(m,bad){V.ghm={m,bad:!!bad};if(V.pop&&V.pop.k=='bk'){const e=document.getElementById('ghm');if(e){e.textContent=m;e.style.color=bad?'var(--bad)':'var(--ok)'}}}
+async function ghSaveCfg(){const o=document.getElementById('gho').value.trim(),r=document.getElementById('ghr').value.trim().replace(/^.*\//,''),t=document.getElementById('ght').value.trim()||ghCfg().t||'';
+if(!o||!r||!t){ghMsg('Fill in your GitHub user, repository and token.',true);return}
+const c={o,r,t};ghMsg('Checking…');
+try{const x=await fetch(ghU(c),{headers:ghH(c)});if(x.status==401||x.status==403){ghMsg('GitHub refused that token.',true);return}if(x.status==404){ghMsg('Repository not found, or the token does not cover it.',true);return}
+const d=await x.json();if(d.private===false){ghMsg('That repository is public. Your business data would be visible to everyone. Make it private first.',true);return}
+c.last=0;localStorage.setItem('evtgh',JSON.stringify(c));ghMsg('Saved. Backing up…');await ghPush(true)}catch(e){ghMsg('Could not reach GitHub ('+e.message+').',true)}}
+async function ghPush(manual){const c=ghCfg();if(!c.t)return false;const body=JSON.stringify(S),h=ghHash(body);if(!manual&&c.h==h)return true;
+try{let sha;const g=await fetch(ghU(c,'/contents/'+ghPath),{headers:ghH(c)});if(g.ok)sha=(await g.json()).sha;else if(g.status!=404)throw new Error('read '+g.status);
+const b64=btoa(unescape(encodeURIComponent(body)));
+const r=await fetch(ghU(c,'/contents/'+ghPath),{method:'PUT',headers:{...ghH(c),'Content-Type':'application/json'},body:JSON.stringify({message:'Backup '+new Date().toISOString(),content:b64,sha})});
+if(!r.ok)throw new Error('write '+r.status);
+c.h=h;delete c.err;c.last=Date.now();localStorage.setItem('evtgh',JSON.stringify(c));ghMsg('Backed up to GitHub '+new Date(c.last).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+'.');return true}
+catch(e){const c2=ghCfg();c2.err=String(e.message||e);localStorage.setItem('evtgh',JSON.stringify(c2));ghMsg('Backup failed ('+e.message+'). It will retry.',true);return false}}
+async function ghRestore(){const c=ghCfg();if(!c.t){ghMsg('Set up GitHub backup first.',true);return}
+try{const r=await fetch(ghU(c,'/contents/'+ghPath),{headers:{...ghH(c),Accept:'application/vnd.github.raw+json'}});if(!r.ok)throw new Error(r.status==404?'no backup in the repository yet':'read '+r.status);
+document.getElementById('bki').value=await r.text();ghMsg('Backup loaded below. Press Restore to apply it.')}catch(e){ghMsg('Could not load ('+e.message+').',true)}}
+function ghOff(){localStorage.removeItem('evtgh');V.ghm=null;render()}
+function ghBlock(){const c=ghCfg(),on=ghOk(),m=V.ghm;
+return`<div class="card" style="margin:0 0 14px"><b>GitHub backup</b>${on?`<div class="mu" style="margin:4px 0 8px">On, saving to ${esc(c.o)}/${esc(c.r)} automatically${c.last?'. Last: '+new Date(c.last).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''}.</div><div style="display:flex;gap:6px"><button style="flex:1" onclick="ghPush(true)">Back up now</button><button style="flex:1" onclick="ghRestore()">Load latest</button><button style="flex:1" onclick="ghOff()">Turn off</button></div>`
+:`<div class="mu" style="margin:4px 0 8px">Saves your data to a <b>private</b> GitHub repository, every time it changes. Use a token limited to that one repository.</div><div class="f"><div><label>GitHub user</label><input id="gho" autocapitalize="off" value="${esc(c.o||'')}"></div><div><label>Repository</label><input id="ghr" autocapitalize="off" value="${esc(c.r||'')}"></div><div style="grid-column:1/-1"><label>Token</label><input id="ght" type="password" autocomplete="off" placeholder="github_pat_…"></div><div style="grid-column:1/-1"><button class="p" style="width:100%" onclick="ghSaveCfg()">Save and back up</button></div></div>`}
+<div id="ghm" class="mu" style="margin-top:6px;${m&&m.bad?'color:var(--bad)':m?'color:var(--ok)':''}">${m?esc(m.m):(c.err&&on?'Last attempt failed: '+esc(c.err):'')}</div></div>`}
+let _ghT=0;function ghAuto(){if(!ghOk()||Date.now()-_ghT<20000)return;_ghT=Date.now();ghPush(false)}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+setInterval(ghAuto,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState=='hidden')ghAuto()});setTimeout(ghAuto,4000);
+function bkDownload(){const b=new Blob([JSON.stringify(S)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='events-backup-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+function bkCopy(){const t=document.getElementById('bko');t.select();try{navigator.clipboard.writeText(t.value)}catch(e){document.execCommand('copy')}toast('Copied')}
+function bkRestore(){const t=document.getElementById('bki').value.trim();try{let n=JSON.parse(t);if(typeof n=='string')n=JSON.parse(n);if(!n||!Array.isArray(n.jobs)||!Array.isArray(n.gear))throw 0;S=n;S.alias=S.alias||{};S.payments=S.payments||[];save();V.pop=null;V.job=null;go('jobs');toast('Restored '+S.jobs.length+' jobs')}catch(e){document.getElementById('bkm').textContent="That doesn't look like a backup."}}
+function newJob(){const j={id:nid(S.jobs),client:'New client',event:'',date:d0(7),status:'Meeting',quote:0,vat:'excl',vatRate:18,lines:[],tasks:[]};S.jobs.push(j);go('jobs',j.id);V.pop={k:'jedit',id:j.id,isNew:true};render()}
+function set(id,k,v){const j=J(id);if(k=='status'){if(v=='Quoted'&&!j.qDate)j.qDate=today();if(v=='Invoiced'&&!j.iDate)j.iDate=today()}j[k]=['quote','vatRate'].includes(k)?+v:k=='friend'?v==='1':v;render()}
+function jobView(){const j=J(V.job),c=calc(j);
+const st=['Meeting','Quoted','Confirmed','Delivered','Invoiced','Paid'],je=V.edit==='job:'+j.id;
+const lines=j.lines.map((l,i)=>{const g=G(l.g);let w='';
+if(!isOut(l)){const b=booked(l.g,j.date,j.id),used=b+j.lines.filter(x=>x.g==l.g&&!isOut(x)).reduce((a,x)=>a+x.q,0);
+if(used>g.qty)w=`<div class="warn">⚠ Clash: you own ${g.qty}, ${used} needed that day. <a href="#" onclick="outsrc(${j.id},${i});return false" style="color:inherit">Outsource</a></div>`}
+return`<div class="card tcard" style="--tc:${tcol(g)}"><div class="row"><span>${l.q} × ${esc(g.name)} ${isOut(l)?'<span class="chip">outsourced'+((l.sup||G(l.g).sup)?' · '+esc(l.sup||G(l.g).sup):'')+(l.ret?' · returned':'')+'</span>':''}${l.rate!=null&&Math.abs(l.rate-g.rate)>0.005?' <span class="chip">price '+m(l.rate)+'</span>':''}</span><span style="white-space:nowrap">${m(lr(l)*l.q)} <button class="x" title="Edit" onclick="openEdit({k:'line',j:${j.id},i:${i}})">✎</button><button class="x" title="Remove" onclick="del(${j.id},'lines',${i})">✕</button></span></div>${w}</div>`}).join('');
+const tasksHtml=taskView(j),tt=j.tasks.reduce((a,t)=>a+(+t.price||0),0);
+return`<button onclick="go('jobs')">← Jobs</button>
+<div class="row" style="margin:12px 0 8px"><h1 style="margin:0">${esc(jt(j))}</h1><button class="x" title="Edit" onclick="openEdit({k:'jedit',id:${j.id}})">✎</button></div>
+<div class="card"><div class="mu">${j.event?esc(j.client)+' · ':''}${j.date}${j.time?' · '+j.time+(j.tEnd?'–'+j.tEnd:''):''} · ${cn(j)}</div>${j.sDate||j.sTime?`<div class="mu" style="margin-top:2px">Setup ${[j.sDate||j.date,j.sTime].filter(Boolean).join(' · ')}</div>`:''}${isUp(j)&&!j.friend?'<div class="mu" style="margin-top:2px">Upcoming · not counted in profit totals yet</div>':''}${j.loc?`<div style="margin-top:4px">📍 <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(j.loc)}" target="_blank" rel="noopener" style="color:inherit">${esc(j.loc)}</a></div>`:''}
+<div class="row" style="margin-top:6px"><span>${j.status}</span>${j.friend?'<span class="chip">Friendly</span>':''}</div>
+<div class="row" style="margin-top:6px;cursor:pointer" onclick="openDv(${j.id})"><span class="mu">${isBk(j)?'Income':'Quote'}${((j.docs||{})[isBk(j)?'invoice':'quote']||{}).pdf?' 📎':''} ›</span><b>${m(j.quote)} <span class="mu" style="font-weight:400">${j.friend?'':j.vat=='incl'?'incl. VAT':j.vat=='excl'?'excl. VAT ('+j.vatRate+'%)':'no VAT'}</span></b></div></div>
+<h2>Documents</h2>${(isBk(j)?['invoice']:j.friend?['quote']:['quote','invoice']).map(k=>{const n=k=='quote'?j.estNo:j.invNo,d=(j.docs||{})[k];return`<div class="card" style="cursor:pointer" onclick="openDv(${j.id},'${k}')"><div class="row"><span><span class="mu">${k=='quote'?'Quote':'Invoice'}</span>${d&&d.pdf?' 📎':''} ${n?'<b>'+esc(n)+'</b>':'<span class="mu">no number</span>'}${d&&d.total!=null?' <span class="mu">· '+m(d.total)+'</span>':''}</span><button onclick="event.stopPropagation();pickDoc(${j.id},'${k}')">${d?'Replace':'Upload PDF'}</button></div></div>`}).join('')}<h2>Equipment</h2>${lines||'<div class="mu">None yet</div>'}
+<div class="f" style="grid-template-columns:1fr 64px auto;align-items:center"><select id="lg" class="ph" onchange="this.classList.toggle('ph',!this.value);if(this.value=='new'){V.pop={k:'gear'};render()}"><option value="">Add equipment…</option>${S.gear.filter(g=>!g.arch).map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('')}<option value="new">+ New equipment…</option></select><input id="lq" type="number" value="1" min="1"><button class="p" aria-label="Add equipment" onclick="addLine(${j.id})">+</button></div>
+<h2>Tasks &amp; crew pay</h2>${tasksHtml}${(()=>{const ids=[...new Set(j.tasks.flatMap(t=>t.assign.map(a=>a.c)))];return ids.length?'<h2>Crew payments</h2>'+ids.map(id=>payRow(j,id,false)).join(''):''})()}
+<h2>Summary</h2><div class="card"><div class="sum"><span>Quote as entered</span><b>${m(j.quote)}</b>${j.friend?'':`<span>VAT (not income)</span><b>${m(c.vatAmt)}</b>`}<span>Revenue (ex VAT)</span><b>${m(c.rev)}</b><span class="mu">Equipment at list rates</span><b class="mu">${m(c.eq)}</b><span class="mu">Tasks at list prices</span><b class="mu">${m(tt)}</b>
+<span>Outsourced cost</span><b>−${m(c.oc)}</b><span>Crew cost</span><b>−${m(c.cc)}</b></div><hr style="border:0;border-top:1px solid var(--ln)">
+<div class="row"><span class="big">${m(c.p)}</span><span class="chip ${c.v[1]}">${Math.round(c.pc)}% · ${c.v[0]}</span></div>
+<div class="mu">${c.hrs}h crew time</div></div>
+<button style="margin-top:8px" onclick="askDel('job',${j.id})">Delete job</button>`}
+const payOf=a=>a.role=='fix'?(+a.amt||0):a.h*(a.role=='op'?C(a.c).op:C(a.c).rig);
+function taskForm(j,t){const tot=t.assign.reduce((x,a)=>x+payOf(a),0),left=(+t.price||0)-tot;
+const selNew=(V.selTask==t.id&&V.selCrew)?V.selCrew:0,isNew=!!(V.pop&&V.pop.isNew);
+const asg=t.assign.map((a,i)=>{const ed=V.ea===t.id+':'+i;
+if(!ed)return`<div class="row" style="margin-top:8px;cursor:pointer" onclick="V.ea='${t.id}:${i}';render()"><span>${esc(C(a.c).name)} <span class="mu">· ${roleTxt(a)}</span></span><span style="white-space:nowrap">${m(payOf(a))} <button class="x" title="Remove" onclick="event.stopPropagation();delAssign(${j.id},${t.id},${i})">✕</button></span></div>`;
+const nm={rig:'Rigging',op:'Operating',fix:'Fixed amount'},roles=['rig','op','fix'].filter(r=>r==a.role||r=='fix'||(r=='rig'?cRig(C(a.c)):cOp(C(a.c))));
+return`<div style="margin-top:8px;padding:8px;border:1px solid var(--ln);border-radius:10px"><div class="row"><b>${esc(C(a.c).name)}</b><span style="white-space:nowrap"><span id="ap${t.id}-${i}">${m(payOf(a))}</span> <button class="x" onclick="V.ea=null;render()">OK</button></span></div>
+<div class="f" style="grid-template-columns:1fr 1fr"><div><label>Role</label><select onchange="setAssign(${j.id},${t.id},${i},'role',this.value)">${roles.map(r=>`<option value="${r}" ${r==a.role?'selected':''}>${nm[r]}</option>`).join('')}</select></div><div><label>${a.role=='fix'?'Amount (€)':'Hours'}</label><input type="number" step="any" inputmode="decimal" value="${a.role=='fix'?(a.amt||0):a.h}" onchange="setAssign(${j.id},${t.id},${i},'val',this.value)"></div></div></div>`}).join('');
+return`<div class="f"><div><label>Task</label><select id="tn${t.id}" class="${t.name?'':'ph'}" onchange="pickTT(${j.id},${t.id},this.value)"><option value="">Choose a task…</option>${(S.taskTypes||[]).slice().sort((a,b)=>a.name.localeCompare(b.name)).map(x=>`<option value="${x.id}" ${x.name==t.name?'selected':''}>${esc(x.name)}</option>`).join('')}${t.name&&!(S.taskTypes||[]).some(x=>x.name==t.name)?`<option value="cur" selected>${esc(t.name)}</option>`:''}<option value="__new">+ New task type…</option></select></div>
+<div><label>Charged to client (€)</label><input type="number" value="${t.price}" onchange="setTaskQ(${j.id},${t.id},'price',this.value)"></div></div>
+<h2>Crew on this task</h2>${asg||'<div class="mu">Nobody assigned yet</div>'}
+<div class="f" style="grid-template-columns:1.6fr 1fr .7fr auto;margin-top:8px;align-items:center"><select id="ac${t.id}" class="${selNew?'':'ph'}" onchange="this.classList.toggle('ph',!this.value);if(this.value=='new'){V.pop={k:'crew',t:${t.id},isNew:${isNew}};render()}else{ar${t.id}.innerHTML=roleSel(+this.value||0);ar${t.id}.className=this.value?'':'ph';av${t.id}.placeholder='Hrs'}"><option value="">Assign crew</option>${S.crew.filter(p=>!p.arch).map(p=>`<option value="${p.id}" ${p.id==selNew?'selected':''}>${esc(p.name)}</option>`).join('')}<option value="new">+ New crew member…</option></select>
+<select id="ar${t.id}" class="${selNew?'':'ph'}" onchange="this.classList.toggle('ph',!this.value);av${t.id}.placeholder=this.value=='fix'?'€':'Hrs'">${roleSel(selNew)}</select>
+<input id="av${t.id}" type="number" placeholder="Hrs" min="0" step="0.5"><button class="p" aria-label="Assign crew" onclick="addAssign(${j.id},${t.id})">+</button></div>
+<div class="row" style="margin-top:12px"><span class="mu">Crew pay · left</span><span id="tsum${t.id}"><b>${m(tot)}</b> <span class="mu">· ${m(left)} left</span></span></div>`}
+function taskView(j){
+const body=j.tasks.map(t=>{const tot=t.assign.reduce((x,a)=>x+payOf(a),0),left=(+t.price||0)-tot;
+const asg=t.assign.map(a=>`<div class="row" style="margin-top:8px"><span>${esc(C(a.c).name)} <span class="mu">· ${a.role=='fix'?'fixed':(a.role=='op'?'operating ':'rigging ')+a.h+'h'}</span></span><span>${m(payOf(a))}</span></div>`).join('');
+return`<div class="card"><div class="row"><b>${esc(t.name)}</b><span style="white-space:nowrap"><button class="x" title="Edit" onclick="openEdit({k:'task',j:${j.id},t:${t.id}})">✎</button><button class="x" title="Delete task" onclick="askDel('task',${j.id},${t.id})">✕</button></span></div><div class="mu">Charged ${m(t.price)} · crew pay ${m(tot)} · ${m(left)} left</div>${asg}</div>`}).join('')||'<div class="mu">No tasks yet. Add e.g. Light operator, Rigging + set-down, Programming, Delivery.</div>';
+const tot={};j.tasks.forEach(t=>t.assign.forEach(a=>{tot[a.c]=(tot[a.c]||0)+payOf(a)}));
+const ppl=Object.entries(tot);
+return body+`<button style="width:100%" onclick="newTask(${j.id})">+ Add task</button>`
++(ppl.length?`<h2>Pay by person</h2><div class="card">${ppl.map(([id,v])=>`<div class="row"><span>${esc(C(+id).name)}</span><b>${m(v)}</b></div>`).join('')}<hr style="border:0;border-top:1px solid var(--ln)"><div class="row"><span class="mu">Total crew pay</span><b>${m(ppl.reduce((a,[,v])=>a+v,0))}</b></div></div>`:'')}
+function newTask(jid){const j=J(jid),id=nid(j.tasks);j.tasks.push({id,name:'',price:0,assign:[]});V.pop={k:'task',j:jid,t:id,isNew:true};render()}
+function setTask(jid,tid,f,v){const t=J(jid).tasks.find(x=>x.id==tid);t[f]=f=='price'?+v:v;render()}
+function delTask(jid,tid){const j=J(jid);j.tasks=j.tasks.filter(x=>x.id!=tid);render()}
+function addAssign(jid,tid){const g=x=>document.getElementById(x+tid),c=g('ac').value,r=g('ar').value,v=+g('av').value||0;if(!c||c=='new'||!r)return;
+J(jid).tasks.find(x=>x.id==tid).assign.push(r=='fix'?{c:+c,role:'fix',amt:v}:{c:+c,role:r,h:v});V.selCrew=null;V.selTask=null;render()}
+function delAssign(jid,tid,i){J(jid).tasks.find(x=>x.id==tid).assign.splice(i,1);render()}
+
+function jobForm(j){const st=['Meeting','Quoted','Confirmed','Delivered','Invoiced','Paid'];return`<div class="f"><div><label>Client</label><select onchange="pickClient(${j.id},this.value)"><option value="">${j.cid||!j.client||j.client=='New client'?'Select client':esc(j.client)+' (not linked)'}</option>${S.contacts.filter(c=>c.isCl||c.id==j.cid).map(c=>`<option value="${c.id}" ${c.id==j.cid?'selected':''}>${esc(c.name)}</option>`).join('')}<option value="new">+ New client…</option></select></div>
+<div><label>Event</label><input value="${esc(j.event)}" onchange="setq(${j.id},'event',this.value)"></div>
+<div style="grid-column:1/-1"><label style="color:var(--tx);font-weight:600">Event date</label><input type="date" style="font-size:18px;font-weight:600;padding:12px" value="${j.date}" onchange="setq(${j.id},'date',this.value)"></div>
+<div><label>Starts</label><input type="time" style="font-size:15px" value="${j.time||''}" onchange="setq(${j.id},'time',this.value)"></div>
+<div><label>Ends</label><input type="time" style="font-size:15px" value="${j.tEnd||''}" onchange="setq(${j.id},'tEnd',this.value)"></div>
+<div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><label style="font-size:11px;opacity:.75">Setup date</label><input type="date" style="font-size:13px;padding:6px 8px" value="${j.sDate||''}" onchange="setq(${j.id},'sDate',this.value)"></div>
+<div><label style="font-size:11px;opacity:.75">Setup time</label><input type="time" style="font-size:13px;padding:6px 8px" value="${j.sTime||''}" onchange="setq(${j.id},'sTime',this.value)"></div></div>
+<div style="grid-column:1/-1"><label>Location</label><input value="${esc(j.loc||'')}" placeholder="Venue or address" onchange="setq(${j.id},'loc',this.value.trim())"></div>
+<div><label>Status</label><select onchange="set(${j.id},'status',this.value)">${st.map(s=>`<option ${s==j.status?'selected':''}>${s}</option>`).join('')}</select></div>
+<div><label>${isBk(j)?'Income (€)':'Final quote value (€)'}</label><input type="number" value="${j.quote}" onchange="setq(${j.id},'quote',this.value)"></div>
+${j.friend?'':`<div><label>Quote value is</label><select onchange="set(${j.id},'vat',this.value)"><option value="excl" ${j.vat=='excl'?'selected':''}>Excluding VAT</option><option value="incl" ${j.vat=='incl'?'selected':''}>Including VAT</option><option value="none" ${j.vat=='none'?'selected':''}>No VAT</option></select></div>
+<div><label>VAT rate (%)</label><input type="number" value="${j.vatRate}" onchange="setq(${j.id},'vatRate',this.value)"></div>`}
+${isBk(j)?'':`<div><label>Quote no.</label><input value="${esc(j.estNo||'')}" onchange="setq(${j.id},'estNo',this.value.trim())"></div>`}
+${j.friend||!(j.status=='Invoiced'||j.status=='Paid'||j.invNo)?'':`<div><label>Invoice no.</label><input value="${esc(j.invNo||'')}" onchange="setq(${j.id},'invNo',this.value.trim())"></div>`}
+<div style="grid-column:1/-1"><label>Category</label><select onchange="set(${j.id},'cat',this.value)">${CT.map(x=>`<option value="${x[0]}" ${cn(j)==x[1]?'selected':''}>${x[1]}</option>`).join('')}</select></div>
+<div style="grid-column:1/-1"><label>Job type</label><select onchange="set(${j.id},'friend',this.value)"><option value="0" ${!j.friend?'selected':''}>Standard</option><option value="1" ${j.friend?'selected':''}>Friendly</option></select></div></div>`}
+const refJobs=(k,id)=>S.jobs.filter(j=>k=='gear'?(j.lines||[]).some(l=>l.g==id):(j.tasks||[]).some(t=>t.assign.some(a=>a.c==id)));
+const itemUse=(k,id)=>{const js=refJobs(k,id);return{js,cl:js.filter(j=>!isUp(j)),op:js.filter(j=>isUp(j))}};
+const closedProfit=()=>S.jobs.filter(j=>!isUp(j)&&!j.friend).reduce((x,j)=>x+calc(j).p,0);
+function applyRepl(k,from,to,incl){let moved=0,kept=0;S.jobs.forEach(j=>{if(!incl&&!isUp(j))return;
+if(k=='gear')(j.lines||[]).forEach(l=>{if(l.g==from){l.g=to;moved++}});
+else(j.tasks||[]).forEach(t=>t.assign.forEach(a=>{if(a.c==from){if(paidBy(j,from)>0){kept++;return}a.c=to;moved++}}))});return{moved,kept}}
+function itemArchive(){const o=V.pop,it=(o.kind=='gear'?G:C)(o.id);it.arch=true;V.pop=null;render();toast('Archived '+it.name+'. Jobs are unchanged.')}
+function itemReplace(){const o=V.pop;if(!o.to)return;const k=o.kind,it=(k=='gear'?G:C)(o.id),nt=(k=='gear'?G:C)(+o.to),r=applyRepl(k,o.id,+o.to,o.cl);
+const left=refJobs(k,o.id).length||(k=='crew'&&PA(o.id).length);
+if(left)it.arch=true;else if(k=='gear')S.gear=S.gear.filter(x=>x.id!=o.id);else S.crew=S.crew.filter(x=>x.id!=o.id);
+V.pop=null;render();toast('Replaced '+it.name+' with '+nt.name+' on '+r.moved+' item'+(r.moved==1?'':'s')+(left?'. '+it.name+' was archived because completed jobs still use it.':'.'),5000)}
+function restoreItem(k,id){delete (k=='gear'?G:C)(id).arch;render()}
+function archList(k){const a=(k=='gear'?S.gear:S.crew).filter(x=>x.arch);if(!a.length)return'';V.ar=V.ar||{};const open=V.ar[k];
+return`<div style="text-align:center;margin-top:24px"><button style="font-size:12px;opacity:.6;border:0;background:none;color:var(--tx)" onclick="V.ar['${k}']=!V.ar['${k}'];render()">Archived (${a.length}) ${open?'⌃':'›'}</button></div>`+(open?`<div class="mu" style="margin:0 0 6px">Archived items stay in the jobs that used them, so past profit is unchanged.</div>`+a.map(x=>`<div class="card"><div class="row"><span><b>${esc(x.name)}</b> <span class="chip">archived</span><div class="mu">${refJobs(k,x.id).length} job${refJobs(k,x.id).length==1?'':'s'}</div></span><button onclick="restoreItem('${k}',${x.id})">Restore</button></div></div>`).join(''):'')}
+function askDel(k,a,b,c){let msg='';
+if((k=='gear'||k=='crew')&&(refJobs(k,a).length||(k=='crew'&&PA(a).length))){SW.open=null;V.pop={k:'itemdel',kind:k,id:a,to:'',cl:false};render();return}
+if(k=='gear'){const g=G(a),n=S.jobs.filter(j=>j.lines.some(l=>l.g==a)).length;msg=`Delete "${g.name}" from your equipment list?`+(n?` It is used in ${n} job${n>1?'s':''}.`:'')}
+else if(k=='crew'){const p=C(a),n=S.jobs.filter(j=>j.tasks.some(t=>t.assign.some(x=>x.c==a))).length;msg=`Delete ${p.name} from your crew list?`+(n?` They are assigned in ${n} job${n>1?'s':''}.`:'')}
+else if(k=='contact'){const c=S.contacts.find(x=>x.id==a),n=S.jobs.filter(j=>jobMatches(j,c)).length;msg=`Delete "${c.name}" from your clients & vendors?`+(n?` ${n} job${n>1?'s':''} reference them.`:'')}
+else if(k=='task'){msg=`Delete the task "${J(a).tasks.find(x=>x.id==b).name||'Untitled'}" and its crew assignments?`}
+else if(k=='tt'){msg=`Delete the task type "${S.taskTypes.find(x=>x.id==a).name}" from your list? Tasks already on jobs keep their names.`}
+else if(k=='job'){msg=`Delete the job "${jt(J(a))}" with its equipment and tasks?`}
+else if(k=='pay'){const p=S.payments.find(x=>x.id==a);msg=`Delete the ${m(p.amt)} payment to ${C(p.c).name}?`}
+else if(k=='line'){const l=J(a).lines[b];msg=`Remove ${l.q} × ${G(l.g).name} from this job?`}
+else{const x=J(a).tasks.find(t=>t.id==b).assign[c];msg=`Remove ${C(x.c).name} from this task?`}
+V.del={k,a,b,c,msg};render()}
+function confirmDel(){const d=V.del;V.del=null;
+if(d.k=='tt')S.taskTypes=S.taskTypes.filter(x=>x.id!=d.a);
+else if(d.k=='gear')S.gear=S.gear.filter(x=>x.id!=d.a);
+else if(d.k=='crew')S.crew=S.crew.filter(x=>x.id!=d.a);
+else if(d.k=='contact')S.contacts=S.contacts.filter(x=>x.id!=d.a);
+else if(d.k=='task'){const j=J(d.a);j.tasks=j.tasks.filter(x=>x.id!=d.b)}
+else if(d.k=='pay')S.payments=S.payments.filter(x=>x.id!=d.a);
+else if(d.k=='job'){idb().then(db=>{try{db.transaction('f','readwrite').objectStore('f').delete(d.a+':quote');db.transaction('f','readwrite').objectStore('f').delete(d.a+':invoice')}catch(e){}}).catch(()=>{});S.jobs=S.jobs.filter(x=>x.id!=d.a);S.payments.forEach(p=>{p.alloc=p.alloc.filter(x=>x.j!=d.a)});V.pop=null;go('jobs');return}
+else if(d.k=='line')J(d.a).lines.splice(d.b,1);
+else J(d.a).tasks.find(t=>t.id==d.b).assign.splice(d.c,1);
+render()}
+function delDlg(){return V.del?`<div class="bdd" onclick="V.del=null;render()"></div><div class="dlg" role="alertdialog"><b>Are you sure?</b><div class="mu" style="margin:6px 0 14px">${esc(V.del.msg)}<br>This can't be undone.</div><div class="row" style="justify-content:flex-end"><button onclick="V.del=null;render()">Cancel</button><button class="dng" onclick="confirmDel()">Delete</button></div></div>`:''}
+function setLine(jid,i,f,v){const l=J(jid).lines[i];l[f]=f=='rate'?(v===''?undefined:Math.max(0,+v||0)):f=='q'?Math.max(1,Math.round(+v)||1):f=='ocost'?+v||0:v;save()}
+function lineForm(j,i){const l=j.lines[i],g=G(l.g);
+return`<datalist id="sups">${sups().map(x=>`<option value="${esc(x)}">`).join('')}</datalist><div class="mu">${esc(g.name)}${isOut(l)?' · outsourced':''} · default charge ${m(g.rate)}/day</div>${isOut(l)?`<div style="margin:8px 0">${chk(l.ret,`setLine(${j.id},${i},'ret',this.checked)`,'Returned to supplier')}</div>`:''}
+<div class="f"><div><label>Quantity for this job</label><input type="number" min="1" step="1" value="${l.q}" onchange="setLine(${j.id},${i},'q',this.value)"></div>
+<div><label>Charge per unit (€), this job</label><input type="number" step="0.01" value="${lr(l)}" placeholder="${g.rate}" onchange="setLine(${j.id},${i},'rate',this.value)"></div>
+<div style="grid-column:1/-1" class="mu">Your default for ${esc(g.name)} is ${m(g.rate)}. Changing the price here only affects this job.${l.rate!=null&&Math.abs(l.rate-g.rate)>0.005?` <a href="#" style="color:var(--tx)" onclick="event.preventDefault();setLine(${j.id},${i},'rate','');render()">Use default</a>`:''}</div>
+${l.out?`<div><label>Cost per unit (€)</label><input type="number" value="${l.ocost||0}" onchange="setLine(${j.id},${i},'ocost',this.value)"></div><div style="grid-column:1/-1"><label>Outsourced from</label><input list="sups" value="${esc(l.sup||'')}" placeholder="Supplier name" onchange="setLine(${j.id},${i},'sup',this.value)"></div>`:''}</div>`}
+function openEdit(o){V.pop=o;render()}
+function resetSel(){V.selCrew=null;V.selTask=null;V.ea=null}
+function setAssign(jid,tid,i,f,v){const t=J(jid).tasks.find(x=>x.id==tid),a=t.assign[i];
+if(f=='role'){a.role=v;if(v=='fix')a.amt=a.amt||0;else a.h=a.h||0;render();return}
+if(a.role=='fix')a.amt=+v||0;else a.h=+v||0;
+const pe=document.getElementById('ap'+tid+'-'+i);if(pe)pe.textContent=m(payOf(a));
+const se=document.getElementById('tsum'+tid);if(se){const tot=t.assign.reduce((x,y)=>x+payOf(y),0);se.innerHTML=`<b>${m(tot)}</b> <span class="mu">· ${m((+t.price||0)-tot)} left</span>`}save()}
+function closePop(){const o=V.pop;if(o&&o.k=='jedit'&&o.isNew){S.jobs=S.jobs.filter(x=>x.id!=o.id);V.job=null}if(o&&o.k=='task'&&o.isNew){const j=J(o.j);j.tasks=j.tasks.filter(x=>x.id!=o.t)}V.pop=null;resetSel();render()}
+function donePop(){const o=V.pop;if(o&&o.k=='task'){const t=J(o.j).tasks.find(x=>x.id==o.t);if(t&&!String(t.name).trim()){const n=document.getElementById('tn'+t.id);if(n){n.focus();n.placeholder='Task name required'}return}}V.pop=null;resetSel();render()}
+function updq(k,id,f,v){const o=S[k].find(x=>x.id==id);o[f]=typeof o[f]=='number'?+v:v;save()}
+function setq(id,k,v){const j=J(id);j[k]=['quote','vatRate'].includes(k)?+v:v;save()}
+function setTaskQ(jid,tid,f,v){const t=J(jid).tasks.find(x=>x.id==tid);t[f]=f=='price'?+v:v;save()}
+function crewRateQ(id,v){const p=C(id);p.rig=p.op=+v;save()}
+function editSheet(e){let t='',f='';
+if(e.k=='gedit'){t='Edit equipment';f=gearForm(S.gear.find(x=>x.id==e.id))}
+else if(e.k=='cedit'){t='Edit crew member';f=crewForm(S.crew.find(x=>x.id==e.id))}
+else if(e.k=='line'){t='Edit equipment on job';f=lineForm(J(e.j),e.i)}
+else if(e.k=='ctedit'){t='Edit contact';f=contactForm(S.contacts.find(x=>x.id==e.id))}
+else if(e.k=='jedit'){t=e.isNew?'New job':'Edit job';f=jobForm(J(e.id))}
+else{t=e.isNew?'New task':'Edit task';f=taskForm(J(e.j),J(e.j).tasks.find(x=>x.id==e.t))}
+return`<div class="bd" onclick="closePop()"></div><div class="sheet"><div class="row" style="margin-bottom:8px"><b>${t}</b><span style="white-space:nowrap">${e.isNew?'<button class="x" onclick="closePop()">Cancel</button> ':''}<button class="p" onclick="donePop()">${e.isNew?'Save':'✓ Done'}</button></span></div>${f}</div>`}
+function popup(){if(!V.pop)return'';if(['gedit','cedit','task','jedit','ctedit','line'].includes(V.pop.k))return editSheet(V.pop);const cl=V.pop.ret?"V.pop=V.pop.ret;render()":V.pop.t?"V.pop={k:'task',j:V.job,t:V.pop.t,isNew:V.pop.isNew};render()":"V.pop=null;render()";
+const top=t=>`<div class="bd" onclick="${cl}"></div><div class="sheet"><div class="row" style="margin-bottom:4px"><b>${t}</b><button class="x" onclick="${cl}">✕</button></div>`;
+if(V.pop.k=='itemdel'){const o=V.pop,k=o.kind,it=(k=='gear'?G:C)(o.id),u=itemUse(k,o.id),nm=esc(it.name),what=k=='gear'?'equipment':'crew member',pays=k=='crew'?PA(o.id).length:0;
+const jl=u.js.slice().sort((a,b)=>a.date<b.date?1:-1).map(j=>`<div class="row" style="margin-bottom:3px"><span>${esc(jt(j))} <span class="mu">${j.date}</span></span><span class="chip">${isUp(j)?'Upcoming':'Completed'}</span></div>`).join('');
+const cands=(k=='gear'?S.gear:S.crew).filter(x=>!x.arch&&x.id!=o.id);
+let prev='';if(o.to){const b=closedProfit();if(o.cl){const sn=JSON.stringify(S.jobs);applyRepl(k,o.id,+o.to,true);const a=closedProfit();S.jobs=JSON.parse(sn);prev=Math.abs(a-b)<0.005?`<div class="mu" style="margin-top:6px">Completed-job profit stays at ${m(b)}.</div>`:`<div style="margin-top:6px;color:var(--bad)"><b>Completed-job profit changes: ${m(b)} → ${m(a)}</b> (${a-b>0?'+':''}${m(a-b)}). Your statistics will change.</div>`}else prev=`<div class="mu" style="margin-top:6px">Completed jobs are not touched, so your statistics stay exactly as they are.</div>`}
+return top(`“${it.name}” is used in jobs`)+`<div class="mu" style="margin-bottom:8px">This ${what} is in ${u.js.length} job${u.js.length==1?'':'s'}${u.cl.length?` (${u.cl.length} completed, counted in your statistics)`:''}${pays?`${u.js.length?' and has':'Has'} ${pays} recorded payment${pays==1?'':'s'}`:''}. Removing it outright would break those jobs and change past profit, so it can't simply be deleted.</div>
+${u.js.length?`<div class="card" style="max-height:130px;overflow:auto;margin-bottom:10px">${jl}</div>`:''}
+<div class="card" style="margin-bottom:10px"><b>Archive (recommended)</b><div class="mu" style="margin:4px 0 8px">Hides ${nm} from lists and pickers. Every job keeps its details and rates, and statistics don't change. You can restore it any time.</div><button class="p" style="width:100%" onclick="itemArchive()">Archive ${nm}</button></div>
+${u.js.length&&cands.length?`<div class="card" style="margin-bottom:6px"><b>Replace with another ${what}</b><div class="mu" style="margin:4px 0 8px">Swaps ${nm} on ${u.op.length?'upcoming jobs':'the jobs'}${u.cl.length?', and on completed jobs only if you tick the box':''}. Anything left behind keeps ${nm} archived.${k=='crew'&&pays?' Jobs where payments are recorded for this person are never moved.':''}</div>
+<select onchange="V.pop.to=this.value;render()"><option value="">Choose replacement…</option>${cands.map(x=>`<option value="${x.id}" ${o.to==x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
+${u.cl.length?`<label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:14px"><input type="checkbox" style="width:auto" ${o.cl?'checked':''} onchange="V.pop.cl=this.checked;render()">Also change the ${u.cl.length} completed job${u.cl.length==1?'':'s'}</label>`:''}${prev}
+<button class="${o.cl?'dng':'p'}" style="width:100%;margin-top:8px" ${o.to?'':'disabled'} onclick="itemReplace()">${o.cl?'Replace and change completed jobs':'Replace'}</button></div>`:''}
+<button style="width:100%" onclick="V.pop=null;render()">Cancel, change nothing</button></div>`}
+if(V.pop.k=='ttnew'||V.pop.k=='ttedit'){const o=V.pop,x=o.k=='ttedit'?S.taskTypes.find(y=>y.id==o.id):null;return top(x?'Edit task type':'New task type')+`<div class="f"><div style="grid-column:1/-1"><label>Name</label><input id="ttn" value="${esc(x?x.name:'')}" placeholder="e.g. Light operator"></div><div style="grid-column:1/-1"><label>Default price (€), optional</label><input id="ttp" type="number" step="0.01" value="${x&&x.price?x.price:''}" placeholder="Used when you add it to a job"></div>${x?'<div class="mu" style="grid-column:1/-1">Renaming only changes the list. Tasks already on jobs keep their names.</div>':''}<div style="grid-column:1/-1"><button class="p" style="width:100%" onclick="saveTT()">${x?'Save':'Add task type'}</button></div></div></div>`}
+if(V.pop.k=='merge')return mergePopup(top);
+if(V.pop.k=='undomerge')return top('Undo last merge')+`<div class="mu" style="margin-bottom:10px">This puts all your data back exactly as it was just before the last merge, including anything you changed since. Continue?</div><button class="dng" style="width:100%;margin-bottom:6px" onclick="undoMerge()">Undo merge</button><button style="width:100%" onclick="V.pop=null;render()">Cancel</button></div>`;
+if(V.pop.k=='dv'){const j=J(V.pop.j),c=calc(j),kd=V.pop.kind||(isBk(j)?'invoice':'quote'),d=(j.docs||{})[kd],no=kd=='quote'?j.estNo:j.invNo,lab=isBk(j)&&kd=='invoice'?'Invoice':kd=='quote'?'Quote':'Invoice',tot=c.rev+c.vatAmt;
+const ln=d&&d.lines&&d.lines.length?d.lines.map(l=>`<div class="row" style="margin-bottom:4px"><span>${esc(l.desc)}<div class="mu">Qty ${+l.qty} · ${m(l.rate)} each</div></span><span>${m(l.amt)}</span></div>`).join(''):'';
+const hasPdf=d&&d.pdf;
+return top((isBk(j)&&kd=='invoice'?'Income':lab)+(no?' '+esc(no):'')).replace('<div class="sheet">','<div class="sheet big">')+`<div class="mu" style="margin-bottom:8px">${esc(jt(j))}${j.event?' · '+esc(j.client):''}</div>
+${hasPdf?`<div id="dvbox"><div class="mu" id="dvmsg">Loading PDF…</div></div>`:d?`<div class="mu" style="margin-bottom:8px">The PDF itself was not saved for this ${lab.toLowerCase()}. Upload it again to see it here.</div>`:`<div class="mu" style="margin-bottom:8px">No ${lab.toLowerCase()} document attached yet.</div>`}
+<div class="dvs"><span><span class="mu">${isBk(j)?'Income':'Quote'}</span> <b>${m(j.quote)}</b></span>${j.friend?'':`<span><span class="mu">Excl. VAT</span> <b>${m(c.rev)}</b></span><span><span class="mu">VAT</span> <b>${m(c.vatAmt)}</b></span><span><span class="mu">Incl.</span> <b>${m(tot)}</b></span>`}${d&&(d.date||d.file)?`<span class="mu">${d.date||''}${d.date&&d.file?' · ':''}${d.file?esc(d.file):''}</span>`:''}</div>
+<div class="dvb"><button onclick="V.pop=null;render();pickDoc(${j.id},'${kd}')">${d?'Replace':'Upload PDF'}</button><button onclick="V.pop={k:'jedit',id:${j.id}};render()">Edit value</button>${hasPdf?`<button id="dvlink" onclick="window.open(_dvu,'_blank')">Open ↗</button>`:''}</div></div>`}
+if(V.pop.k=='doc'){const o=V.pop,html=top(docTitle())+docReview()+'</div>',wide=o.url&&innerWidth>=900;
+const frame=o.url?`<div class="${wide?'pdfp':'pdfo'}">${wide?'':'<div class="row" style="padding:8px 12px"><b>Uploaded PDF</b><button class="x" onclick="V.pop.pdf=false;render()">✕</button></div>'}<iframe src="${o.url}" title="Uploaded PDF"></iframe><div class="mu" style="padding:6px 12px"><a href="${o.url}" target="_blank" rel="noopener" style="color:inherit">Open the PDF in a new tab</a></div></div>`:'';
+return wide?frame+html.replace('<div class="sheet">','<div class="sheet wide">'):html+(o.pdf?frame:'')}
+if(V.pop.k=='paste')return top('Paste document text')+pasteForm()+'</div>';
+if(V.pop.k=='cnew')return top(V.pop.cl&&!V.pop.ve?'New client':V.pop.ve&&!V.pop.cl?'New vendor':'New contact')+`<div class="f"><div style="grid-column:1/-1"><label>Name</label><input id="ncn" value="${esc(V.pop.name||'')}"></div>
+<div>${chk(!!V.pop.cl,'','Client').replace('<input','<input id="ncc"')}</div><div>${chk(!!V.pop.ve,'','Vendor').replace('<input','<input id="ncv"')}</div>
+<div><label>Phone</label><input id="nph" type="tel"></div><div><label>Email</label><input id="nem" type="email"></div>
+<div style="grid-column:1/-1"><label>Notes</label><input id="nno"></div>
+<div style="grid-column:1/-1"><button class="p" style="width:100%" onclick="saveNewContact()">Save</button></div></div></div>`;
+if(V.pop.k=='bk')return top('Backup & restore')+`<div class="mu" style="margin-bottom:4px">Your data. Copy it and keep it somewhere safe.</div><textarea id="bko" readonly rows="4" style="font:inherit;font-size:12px;color:var(--tx);background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:8px;width:100%" onfocus="this.select()">${esc(JSON.stringify(S))}</textarea><div style="display:flex;gap:6px;margin:6px 0 14px"><button style="flex:1" onclick="bkCopy()">Copy</button><button style="flex:1" onclick="bkDownload()">Download file</button></div>${ghBlock()}<div class="mu" style="margin-bottom:4px">Restore: paste a backup here. This replaces what is in the app now.</div><textarea id="bki" rows="4" style="font:inherit;font-size:12px;color:var(--tx);background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:8px;width:100%" placeholder="Paste backup text"></textarea><div id="bkm" class="mu" style="color:var(--bad)"></div><button class="p" style="width:100%;margin-top:6px" onclick="bkRestore()">Restore</button></div>`;
+if(V.pop.k=='pay')return top('Payment · '+esc(C(V.pop.c).name))+payPop()+'</div>';
+if(V.pop.k=='paywho')return top('Who was paid?')+S.crew.map(c=>`<button style="width:100%;margin-bottom:6px;text-align:left" onclick="openPay(${c.id})">${esc(c.name)}</button>`).join('')+'</div>';
+if(V.pop.k=='out')return top('Outsource this item')+`<datalist id="sups">${sups().map(x=>`<option value="${esc(x)}">`).join('')}</datalist><div class="f"><div><label>Outsourced from</label><input id="os" list="sups" placeholder="Supplier name" onchange="fillOut()"></div><div><label>Cost per unit (€)</label><input id="oc" type="number" value="0"></div><div style="grid-column:1/-1"><button class="p" style="width:100%" onclick="saveOut()">Save</button></div></div></div>`;
+if(V.pop.k=='gear')return top('New equipment')+`<datalist id="sups">${sups().map(x=>`<option value="${esc(x)}">`).join('')}</datalist><div class="f"><div style="grid-column:1/-1"><label>Name</label><input id="pgn"></div>
+<div><label>Type</label><select id="pgo" onchange="pgx.style.display=this.value=='out'?'contents':'none'"><option value="owned">Owned</option><option value="out">Outsourced</option></select></div>
+<div><label>Qty owned</label><input id="pgq" type="number" value="1"></div>
+<div><label>Default charge/day (€)</label><input id="pgr" type="number" value="0"></div>
+<div><label>Qty for this job</label><input id="pgj" type="number" value="1" min="1"></div>
+${catBoxes('pgcat')}
+<div id="pgx" style="display:none"><div style="grid-column:1/-1"><label>Outsourced from</label><input id="pgs" list="sups" placeholder="Supplier name" onchange="fillSup('pg')"></div><div style="grid-column:1/-1"><label>Cost basis</label><select id="pgm" onchange="pgE.style.display=this.value=='eur'?'contents':'none';pgD.style.display=this.value=='disc'?'contents':'none'"><option value="eur">Fixed € per day</option><option value="disc">Discount off vendor price</option></select></div><div id="pgE" style="display:contents"><div style="grid-column:1/-1"><label>Supplier cost (€ per day)</label><input id="pgc" type="number" value="0"></div></div><div id="pgD" style="display:none"><div><label>Vendor price/day (€)</label><input id="pgvp" type="number" placeholder="same as charge"></div><div><label>Discount (%)</label><input id="pgdc" type="number" value="0"></div></div></div>
+<div style="grid-column:1/-1"><button class="p" style="width:100%" onclick="savePopGear()">Save &amp; add to job</button></div></div></div>`;
+return top('New crew member')+`<div class="f"><div style="grid-column:1/-1"><label>Name</label><input id="pcn"></div>
+<div>${chk(true,"pcw1.style.display=this.checked?'block':'none'",'Rigging').replace('<input','<input id="pcrc"')}<div id="pcw1" style="margin-top:6px"><label>Rigging €/h</label><input id="pcrr" type="number" value="0"></div></div>
+<div>${chk(true,"pcw2.style.display=this.checked?'block':'none'",'Operating').replace('<input','<input id="pcoc"')}<div id="pcw2" style="margin-top:6px"><label>Operating €/h</label><input id="pcor" type="number" value="0"></div></div>
+<div style="grid-column:1/-1"><button class="p" style="width:100%" onclick="savePopCrew()">Save crew member</button></div></div></div>`}
+function savePopGear(){if(!pgn.value.trim())return;const id=nid(S.gear);S.gear.push({id,name:pgn.value.trim(),own:pgo.value,qty:+pgq.value||0,rate:+pgr.value||0,cost:pgm.value=='eur'?+pgc.value||0:0,costMode:pgm.value,vprice:+pgvp.value||0,disc:+pgdc.value||0,sup:pgs.value.trim(),cats:readCats('pgcat')});J(V.job).lines.push({g:id,q:+pgj.value||1});V.pop=null;render()}
+function savePopCrew(){if(!pcn.value.trim())return;const r=pcrc.checked,o=pcoc.checked,a=+pcrr.value||0,b=+pcor.value||0,id=nid(S.crew);S.crew.push({id,name:pcn.value.trim(),canRig:r,canOp:o,rig:a,op:o?b:a,same:r&&o&&a==b});V.selCrew=id;const q=V.pop;V.selTask=q.t;V.pop={k:'task',j:V.job,t:q.t,isNew:q.isNew};render()}
+function addLine(id){let g=lg.value;if(!g||g=='new')return;J(id).lines.push({g:+g,q:+lq.value||1});render()}
+/* ---- documents: read, match, learn ---- */
+const LAB=/operator|rigg|\brig\b|set[- ]?up|set[- ]?down|strike|programm|technician|engineer|crew|labou?r|deliver|transport|driver|install|dismantl|load[- ]?(in|out)|rehears|sound ?check|supervis|manager|staff/i;
+let DEC='.';
+const DATEISH=/^\d{1,2}[.\/-]\d{1,2}[.\/-]\d{2,4}$/;
+const isNum=t=>/^[€$£]?-?\d[\d.,]*€?$/.test(t)&&!DATEISH.test(t);
+const toNum=t=>{t=String(t).replace(/[€$£\s]/g,'');return parseFloat(DEC==','?t.replace(/\./g,'').replace(',','.'):t.replace(/,/g,''))};
+function detectDec(text){let c=0,d=0;(text.match(/\d[\d.,]*\d/g)||[]).forEach(t=>{if(DATEISH.test(t))return;if(/,\d{1,2}$/.test(t))c++;else if(/\.\d{1,2}$/.test(t))d++});return c>d?',':'.'}
+const UNIT=/^(pcs?|nos?|days?|hrs?|hours?|h|units?|sets?|ea|each)$/i;
+const MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+function parseDate(s){s=String(s||'');let a=s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);if(a)return a[1]+'-'+pad(+a[2])+'-'+pad(+a[3]);
+a=s.match(/(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/);if(a){const y=a[3].length==2?'20'+a[3]:a[3];return y+'-'+pad(+a[2])+'-'+pad(+a[1])}
+a=s.match(/(\d{1,2})\s+([A-Za-z]{3})[A-Za-z]*\.?,?\s+(\d{4})/);if(a&&MON[a[2].toLowerCase()])return a[3]+'-'+pad(MON[a[2].toLowerCase()])+'-'+pad(+a[1]);return ''}
+function rowsFromItems(items){const rows={};items.forEach(it=>{if(!it.str||!it.str.trim())return;const y=Math.round(it.transform[5]/3);(rows[y]=rows[y]||[]).push({x:it.transform[4],w:it.width||0,s:it.str.trim()})});
+return Object.keys(rows).map(Number).sort((a,b)=>b-a).map(y=>{let o='',px=null;rows[y].sort((a,b)=>a.x-b.x).forEach(c=>{if(px!==null)o+=(c.x-px>6?'\t':' ');o+=c.s;px=c.x+c.w});return o})}
+function cleanDesc(d){const N='[€$£]?\\d[\\d.,]*';let o=d,p;do{p=o;o=o.replace(new RegExp('^\\(?\\s*'+N+'\\s*(?:pcs?|units?|nos?)?\\s*[x×*]\\s*\\)?\\s*[-–:]?\\s*','i'),'').replace(new RegExp('\\s*\\(?\\s*'+N+'\\s*(?:pcs?|units?|nos?)?\\s*[x×*]\\s*'+N+'\\s*(?:pcs?|units?|days?|eur|€)?\\s*\\)?\\s*$','i'),'').replace(new RegExp('\\s*[x×*]\\s*'+N+'\\s*(?:pcs?|units?|days?)?\\s*$','i'),'').replace(new RegExp('\\s+'+N+'\\s*(?:pcs?|units?|nos?|days?|hrs?|hours?|h)\\s*$','i'),'').replace(/\s*[-–,:]\s*$/,'').trim()}while(o!==p&&o.length>1);return o||d}
+function parseLine(r,cells){let t=r.replace(/\t/g,' ').replace(/\s+/g,' ').trim();
+t=t.replace(/\s+\(?\d+(?:[.,]\d+)?\s?%\)?$/,'');
+const toks=t.split(' '),raw=[];
+while(toks.length){const x=toks[toks.length-1];
+if(isNum(x)){raw.unshift(toks.pop());continue}
+if(/^\(?\d+(?:[.,]\d+)?\s?%\)?$/.test(x)&&raw.length){toks.pop();continue}
+if(UNIT.test(x)&&raw.length&&toks.length>1&&isNum(toks[toks.length-2])){toks.pop();continue}
+break}
+const nums=raw.map(toNum);if(nums.length<2||!toks.length)return null;
+let qty,rate,amt,used;
+if(nums.length>=3&&Math.abs(nums[nums.length-3]*nums[nums.length-2]-nums[nums.length-1])<=0.02+0.002*Math.abs(nums[nums.length-1])){[qty,rate,amt]=nums.slice(-3);used=3}
+else if(nums.length>=3&&(()=>{const n=nums.length,k=nums.length>=4?4:3,q=nums[n-k],rt=nums[n-k+1],am=nums[n-1];return q>0&&q<=1000&&Number.isInteger(q)&&rt>0&&am>0&&am<=q*rt+0.02&&am>=q*rt*0.3})()){const n=nums.length,k=n>=4?4:3;qty=nums[n-k];rate=nums[n-k+1];amt=nums[n-1];used=k}
+else{rate=nums[nums.length-2];amt=nums[nums.length-1];const q=rate?amt/rate:1;if(rate&&Math.abs(q-Math.round(q))<0.005&&Math.round(q)>=1){qty=Math.round(q)}else{qty=1;rate=amt}used=2}
+let desc=toks.concat(raw.slice(0,raw.length-used)).join(' ');
+if(cells&&/^\d{1,3}$/.test((cells[0]||'').trim())&&cells.length>=3)desc=desc.replace(/^\d{1,3}\s+/,'');
+else desc=desc.replace(/^\d{1,2}\s+(?=\D)/,'');
+desc=cleanDesc(desc.replace(/^#\s*/,'').trim());
+if(desc.length<2||/^(sub\s?total|total|vat|tax|balance|discount adj)/i.test(desc))return null;
+return{desc,qty,rate,amt}}
+function parseRows(rows,file){const d={file:file||'',kind:'',no:'',date:'',subject:'',client:'',sub:null,tax:0,total:null,lines:[]};
+rows=rows.map(r=>String(r).replace(/\s+$/,'')).filter(r=>r.trim());
+const text=rows.join('\n'),head=text.slice(0,700).toLowerCase();
+DEC=detectDec(text);
+const title=rows.slice(0,5).join(' ').toLowerCase();
+d.kind=/\bquote\b|quotation|estimate/.test(title)||/quote\s*#/i.test(text)?'quote':/invoice/.test(title)||/invoice/.test(head)?'invoice':'';
+let a=text.match(/(?:Invoice|Estimate|Quote|Quotation)\s*#\s*:?\s*([A-Za-z]{0,6}[-\/]?\d[\w\-\/]*)/i)||text.match(/#\s*([A-Z]{2,6}-\d+)/);if(a)d.no=a[1];
+a=text.match(/(?:Invoice|Estimate|Quote|Quotation)\s*Date\s*:?\s*([^\t\n]+)/i);d.date=a?parseDate(a[1]):parseDate(head);
+a=text.match(/Subject\s*:?\s*([^\n\t]+)/i);if(a)d.subject=a[1].trim();
+const SKIP=/^(ship\s*to|quote|invoice|estimate|date|terms|due|expiry|place of|reference|subject|vat|tax|#|item|qty|rate|amount|balance|total|sub\s*total)/i;
+const bi=rows.findIndex(r=>r.split('\t').some(c=>/^\s*bill\s*to\b/i.test(c)));
+if(bi>=0){const cs=rows[bi].split('\t').map(x=>x.trim()),ci=cs.findIndex(c=>/^bill\s*to\b/i.test(c));let c=cs[ci].replace(/^bill\s*to\s*:?\s*/i,'').trim();
+if(!c&&cs[ci+1]&&!SKIP.test(cs[ci+1]))c=cs[ci+1];
+for(let q=bi+1;!c&&q<rows.length&&q<bi+5;q++){const c2=rows[q].split('\t').map(x=>x.trim()).filter(Boolean),all=rows[q].split('\t').map(x=>x.trim());const cand=(all[ci]&&!SKIP.test(all[ci]))?all[ci]:(c2.find(x=>!SKIP.test(x))||'');if(cand&&!SKIP.test(cand))c=cand}
+d.client=c}
+if(!d.client){const m2=text.match(/(?:customer\s*name|client|customer)\s*:?\s*([^\n\t]+)/i);if(m2&&!SKIP.test(m2[1].trim()))d.client=m2[1].trim()}
+d.rows=rows;
+const hdr=rows.findIndex(r=>/qty|quantity/i.test(r)&&/rate|price/i.test(r)&&/amount|total/i.test(r));
+let started=hdr>=0,last=null;
+rows.forEach((r,i)=>{const lab=r.split('\t')[0].trim(),nums=r.replace(/\t/g,' ').split(' ').filter(isNum),num=nums.length?toNum(nums[nums.length-1]):null;
+if(/^sub\s*total/i.test(lab)){d.sub=num;started=false;return}
+if(/^total\b/i.test(lab)&&!/due/i.test(lab)){d.total=num;started=false;return}
+if(/^(vat|tax|standard rate|reduced rate|zero rate)/i.test(lab)&&num!=null&&i>hdr&&d.lines.length){d.tax+=num;started=false;return}
+if(i<=hdr||/^(balance due|notes|terms)/i.test(lab))return;
+if(hdr<0&&!d.lines.length&&/date|invoice|estimate|quote|bill to|subject|ship to/i.test(lab))return;
+if(!started&&hdr<0)started=true;
+if(!started)return;
+const L=parseLine(r,r.split('\t'));
+if(L){d.lines.push(L);last=L}else if(last&&!isNum(lab)&&!/^(notes|terms)/i.test(lab))last.note=((last.note||'')+' '+r.trim()).trim()});
+if(d.total==null){const s=d.lines.reduce((x,l)=>x+l.amt,0);d.total=d.sub!=null?d.sub+d.tax:(d.lines.length?s+d.tax:null)}
+if(d.sub==null&&d.total!=null)d.sub=d.total-d.tax;
+return d}
+const norm=s=>String(s).toLowerCase().replace(/[^a-z0-9"\s]/g,' ').replace(/\s+/g,' ').trim();
+const STOP=new Set(['the','and','of','with','for','a','x','w','inc','incl','set','pcs']);
+const toks=s=>norm(s).split(' ').filter(t=>t&&!STOP.has(t));
+function sim(a,b){const A=new Set(toks(a)),B=new Set(toks(b));if(!A.size||!B.size)return 0;let i=0;A.forEach(t=>{if(B.has(t))i++});return i/Math.min(A.size,B.size)*0.6+i/(A.size+B.size-i)*0.4}
+function matchClient(name){const n=norm(name),al=S.alias['c:'+n];if(al&&S.contacts.some(c=>c.id==al.id))return S.contacts.find(c=>c.id==al.id);
+const cl=S.contacts.filter(c=>c.isCl);let b=cl.find(c=>norm(c.name)==n)||cl.find(c=>n&&(n.includes(norm(c.name))||norm(c.name).includes(n)));if(b)return b;
+let best=null,bs=0;cl.forEach(c=>{const x=sim(c.name,name);if(x>bs){bs=x;best=c}});return bs>=0.6?best:null}
+function autoMatch(l,j,mode){const al=S.alias[norm(l.desc)];
+if(al){if(al.t=='task')return 'task';if(al.t=='gear'&&S.gear.some(g=>g.id==al.id))return 'g:'+al.id}
+if(l.amt<0)return 'skip';
+if(j){const c=j.lines.filter(x=>Math.abs(G(x.g).rate*x.q-l.amt)<0.01);if(c.length)return 'g:'+c.sort((p,q)=>sim(G(q.g).name,l.desc)-sim(G(p.g).name,l.desc))[0].g;
+const t=j.tasks.filter(x=>(+x.price||0)>0&&Math.abs(+x.price-l.amt)<0.01);if(t.length)return 't:'+t.sort((p,q)=>sim(q.name,l.desc)-sim(p.name,l.desc))[0].id;
+const tn=j.tasks.map(x=>[x,sim(x.name,l.desc)]).sort((p,q)=>q[1]-p[1])[0];if(tn&&tn[1]>=0.5)return 't:'+tn[0].id}
+let best=null,bs=0;S.gear.forEach(g=>{if(g.arch)return;const x=sim(g.name,l.desc);if(x>bs){bs=x;best=g}});if(best&&bs>=0.5)return 'g:'+best.id;
+if(LAB.test(l.desc))return 'task';
+return mode=='new'?'newg':'skip'}
+let DK=null;
+function toast(t,ms){const e=document.getElementById('toast');e.textContent=t;e.style.display=t?'block':'none';clearTimeout(toast.h);if(t&&ms!==0)toast.h=setTimeout(()=>{e.style.display='none'},ms||4000)}
+let _db;function idb(){return _db||(_db=new Promise((res,rej)=>{const r=indexedDB.open('evtfiles',1);r.onupgradeneeded=()=>r.result.createObjectStore('f');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}))}
+function idbPut(k,v){return idb().then(db=>new Promise((res,rej)=>{const t=db.transaction('f','readwrite');t.objectStore('f').put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error)}))}
+function idbGet(k){return idb().then(db=>new Promise((res,rej)=>{const r=db.transaction('f').objectStore('f').get(k);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}))}
+let _dvu;function openDv(jid,kind){V.pop={k:'dv',j:jid,kind};render();loadDv()}
+async function loadDv(){const o=V.pop;if(!o||o.k!='dv')return;const j=J(o.j),kd=o.kind||(isBk(j)?'invoice':'quote'),d=(j.docs||{})[kd];if(!d||!d.pdf)return;
+try{const b=await idbGet(o.j+':'+kd);const box=document.getElementById('dvbox');if(!box||!V.pop||V.pop.k!='dv')return;
+if(!b){box.innerHTML='<div class="mu">The PDF is no longer stored in this browser. Upload it again.</div>';return}
+if(_dvu)URL.revokeObjectURL(_dvu);_dvu=URL.createObjectURL(b);box.innerHTML='<iframe id="dvf" class="dvf" title="Uploaded PDF" src="'+_dvu+'"></iframe>';
+}catch(e){const box=document.getElementById('dvbox');if(box)box.innerHTML='<div class="mu">Could not open the saved PDF.</div>'}}
+function pickDoc(jid,kind){DK={jid,kind};const f=document.getElementById('docf');f.value='';f.click()}
+async function readDoc(f){if(!f||!DK)return;const tgt=DK;toast('Reading '+f.name+'…',0);
+try{if(!window.pdfjsLib)throw new Error('The PDF reader could not load here.');
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const pd=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;let rows=[];
+for(let i=1;i<=pd.numPages;i++){const pg=await pd.getPage(i);rows=rows.concat(rowsFromItems((await pg.getTextContent()).items))}
+toast('');tgt.file=f;try{tgt.url=URL.createObjectURL(f)}catch(e){}openDocReview(parseRows(rows,f.name),tgt)}catch(e){toast('');V.pop={k:'paste',tgt,err:'Could not read '+f.name+' ('+e.message+').'};render()}}
+function openDocReview(d,tgt){const mode=tgt.jid?'attach':'new',kind=tgt.kind=='auto'?(d.kind||'quote'):tgt.kind,j=tgt.jid?J(tgt.jid):null;
+if(!d.lines.length&&d.total==null){V.pop={k:'paste',tgt,err:"I couldn't find any lines or totals in that document."};render();return}
+const sel=d.lines.map(l=>autoMatch(l,j,mode));let cl='';
+if(mode=='new'&&d.client){const c=matchClient(d.client);cl=c?String(c.id):'new'}
+const hv=d.tax>0&&d.sub>0;V.pop={k:'doc',mode,jid:tgt.jid,kind,d,sel,cl,upd:false,url:tgt.url||'',file:tgt.file||null,qv:hv?Math.round(d.sub*100)/100:(d.sub||d.total||0),qvat:hv?'excl':'none',qrate:hv?Math.round(d.tax/d.sub*100):18};render()}
+function pasteForm(){const o=V.pop;return`<div class="mu" style="margin-bottom:8px">${esc(o.err||'')} Open the PDF, select all, copy, and paste the text here.</div><textarea id="ptx" rows="9" style="font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:8px;width:100%" placeholder="Paste the invoice or quote text"></textarea><button class="p" style="width:100%;margin-top:10px" onclick="readPasted()">Read text</button>`}
+function readPasted(){const rows=document.getElementById('ptx').value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);if(!rows.length)return;openDocReview(parseRows(rows,'pasted text'),V.pop.tgt)}
+function docTitle(){const o=V.pop;return(o.mode=='new'?'Import ':'Attach ')+(o.kind=='invoice'?'invoice':'quote')}
+function docReview(){const o=V.pop,d=o.d,j=o.mode=='attach'?J(o.jid):null;o.ch=o.ch||{};
+const gopts=S.gear.filter(g=>!g.arch).map(g=>`<option value="g:${g.id}">${esc(g.name)}</option>`).join('');
+const topt=j?j.tasks.map(t=>`<option value="t:${t.id}">${esc(t.name||'Untitled task')}</option>`).join(''):'';
+const lab=v=>v=='skip'?'Ignored':v=='task'?(j?'Labour (not added)':'Becomes a task'):v=='newg'?'New equipment, added to your gear list':v.startsWith('g:')?'Your equipment: '+esc(G(+v.slice(2)).name):v.startsWith('t:')?'Task: '+esc(((j&&j.tasks.find(t=>t.id==+v.slice(2)))||{}).name||'Untitled'):'';
+const lines=d.lines.map((l,i)=>{const v=o.sel[i],gm=v.startsWith('g:')?S.gear.find(g=>g.id==+v.slice(2)):null,sl=x=>x.replace('value="'+v+'"','value="'+v+'" selected');
+return`<div class="card" style="padding:10px;margin-bottom:6px"><div class="row"><b>${esc(l.desc)}</b><span>${m(l.amt)}</span></div><div class="mu">Qty ${+l.qty} · ${m(l.rate)} each</div>
+<div class="row" style="margin-top:4px"><span class="mu" style="color:${v=='skip'?'var(--mu)':'var(--ok)'}">${lab(v)}</span><button class="x" style="width:auto;padding:0 8px" onclick="V.pop.ch[${i}]=!V.pop.ch[${i}];render()">${o.ch[i]?'Done':'Change'}</button></div>
+${o.ch[i]?`<select style="margin-top:6px" onchange="V.pop.sel[${i}]=this.value;render()"><option value="skip" ${v=='skip'?'selected':''}>Ignore this line</option><optgroup label="Use your equipment">${sl(gopts)}</optgroup>${j?`<optgroup label="Tasks on this job">${sl(topt)}</optgroup><option value="task" ${v=='task'?'selected':''}>Labour</option>`:`<option value="task" ${v=='task'?'selected':''}>Labour task</option><option value="newg" ${v=='newg'?'selected':''}>New equipment</option>`}</select>`:''}
+${gm&&Math.abs(gm.rate-l.rate)>0.005?`<div class="mu" style="color:var(--wa);margin-top:4px">Your gear list has ${m(gm.rate)}, this document says ${m(l.rate)}. This job will use ${m(l.rate)}; your default stays ${m(gm.rate)}.</div>`:''}</div>`}).join('')||'<div class="mu">No line items found. The totals can still be imported.</div>';
+const cli=o.mode=='new'?`<div style="margin:10px 0"><label class="mu" style="display:block;margin-bottom:2px">Client${d.client?'':' · none found in the PDF'}</label><select onchange="V.pop.cl=this.value;render()"><option value="">${d.client?'Not set':'Leave blank'}</option>${S.contacts.filter(c=>c.isCl).map(c=>`<option value="${c.id}" ${String(c.id)==o.cl?'selected':''}>${esc(c.name)}</option>`).join('')}${d.client?`<option value="new" ${o.cl=='new'?'selected':''}>${esc(d.client)} (new client)</option>`:''}</select><button style="width:100%;margin-top:6px" onclick="V.pop={k:'cnew',cl:true,ve:false,name:V.pop.cl=='new'||!V.pop.cl?(V.pop.d.client||''):'',ret:V.pop};render()">+ New client with details…</button></div>`:'';
+const qf=`<div class="f" style="margin:10px 0"><div><label>Quote value (€)</label><input type="number" step="0.01" value="${(+o.qv||0).toFixed(2)}" oninput="V.pop.qv=+this.value"></div><div><label>This amount is</label><select onchange="V.pop.qvat=this.value;render()"><option value="excl" ${o.qvat=='excl'?'selected':''}>Excluding VAT</option><option value="incl" ${o.qvat=='incl'?'selected':''}>Including VAT</option><option value="none" ${o.qvat=='none'?'selected':''}>No VAT</option></select></div>${o.qvat!='none'?`<div><label>VAT rate (%)</label><input type="number" value="${o.qrate}" oninput="V.pop.qrate=+this.value"></div>`:''}</div>`;
+const upd=j?`<div style="margin:10px 0">${chk(o.upd,"V.pop.upd=this.checked;render()",'Also set this job\'s quote value from the document')}</div>${o.upd?qf:''}`:qf;
+return`<div class="card" style="margin-bottom:6px"><div class="row"><b>${o.kind=='invoice'?'Invoice':'Quote'} ${esc(d.no||'')}</b><span>${m(d.tax&&d.sub?d.sub:(d.total||0))}${d.tax&&d.sub?' <span class="mu" style="font-weight:400">excl. VAT</span>':''}</span></div><div class="mu">${d.client?esc(d.client)+' · ':''}${d.date||'no date found'}${d.tax?' · VAT '+m(d.tax)+' · total '+m(d.total||0):''}</div></div>${cli}${j?'':''}<div class="mu" style="margin:10px 0 6px">${o.mode=='new'?'This creates the job with:':'Lines found in the document:'}</div>${lines}${upd}${o.url&&innerWidth<900?'<button style="width:100%;margin-top:8px" onclick="V.pop.pdf=true;render()">View the PDF</button>':''}<div style="margin-top:8px"><button style="font-size:12px;opacity:.6;border:0;background:none;color:var(--tx);padding:0" onclick="V.pop.dbg=!V.pop.dbg;render()">${o.dbg?'Hide':'Show'} text read from the PDF</button>${o.dbg?`<div class="mu" style="font-size:11px;white-space:pre-wrap;max-height:160px;overflow:auto;border:1px solid var(--ln);border-radius:8px;padding:6px;margin-top:4px">${esc((d.rows||[]).map(r=>r.replace(/\t/g,'  |  ')).join('\n'))}</div>`:''}</div><button class="p" style="width:100%;margin-top:8px" onclick="confirmDoc()">${o.mode=='new'?'Create job':'Attach to job'}</button>`}
+function setQuoteFrom(j,d){if(d.tax>0&&d.sub>0){j.quote=Math.round(d.sub*100)/100;j.vat='excl';j.vatRate=Math.round(d.tax/d.sub*100)}else{j.quote=d.sub||d.total||0;j.vat='none';j.vatRate=18}}
+function confirmDoc(){const o=V.pop,d=o.d;let j;
+if(o.mode=='new'){let cid=0;const nn=(o.newName!=null?o.newName:(d.client||'')).trim();if(o.cl=='new'&&nn){cid=nid(S.contacts);S.contacts.push({id:cid,name:nn,isCl:true,isVe:false,phone:'',email:'',notes:''})}else if(o.cl)cid=+o.cl;
+if(cid&&d.client)S.alias['c:'+norm(d.client)]={t:'client',id:cid};
+const ct=cid?S.contacts.find(c=>c.id==cid):null;
+j={id:nid(S.jobs),client:ct?ct.name:(d.client||'New client'),cid:cid||undefined,event:d.subject||'',date:d0(7),status:o.kind=='invoice'?'Invoiced':'Quoted',quote:0,vat:'excl',vatRate:18,lines:[],tasks:[]};
+j.quote=+o.qv||0;j.vat=o.qvat;j.vatRate=+o.qrate||0;S.jobs.push(j)}else{j=J(o.jid);if(o.upd){j.quote=+o.qv||0;j.vat=o.qvat;j.vatRate=+o.qrate||0}}
+d.lines.forEach((l,i)=>{const v=o.sel[i],k=norm(l.desc);
+if(v.startsWith('g:')){const gid=+v.slice(2);S.alias[k]={t:'gear',id:gid};const rv=l.rate>0&&Math.abs(G(gid).rate-l.rate)>0.005?{rate:l.rate}:{};if(o.mode=='new'){const ex=j.lines.find(x=>x.g==gid);if(ex)ex.q+=Math.round(l.qty)||1;else j.lines.push({g:gid,q:Math.round(l.qty)||1,...rv})}else{const ex=j.lines.find(x=>x.g==gid);if(ex&&rv.rate)ex.rate=rv.rate}}
+else if(v=='newg'){const id=nid(S.gear);S.gear.push({id,name:l.desc,own:'owned',qty:Math.max(1,Math.round(l.qty)),rate:l.rate,cost:0,cats:[]});S.alias[k]={t:'gear',id};j.lines.push({g:id,q:Math.round(l.qty)||1})}
+else if(v=='task'){S.alias[k]={t:'task'};if(o.mode=='new')j.tasks.push({id:nid(j.tasks),name:l.desc,price:l.amt,assign:[]})}
+else if(v.startsWith('t:')){S.alias[k]={t:'task'}}});
+if(o.kind=='quote'){j.estNo=d.no||j.estNo;if(/^\d{4}-\d\d-\d\d$/.test(d.date||''))j.qDate=d.date}else{j.invNo=d.no||j.invNo;if(/^\d{4}-\d\d-\d\d$/.test(d.date||''))j.iDate=d.date}
+j.docs=j.docs||{};j.docs[o.kind]={pdf:!!o.file,no:d.no,date:d.date,total:d.total,sub:d.sub,tax:d.tax,file:d.file,n:d.lines.length,lines:d.lines.map(l=>({desc:l.desc,qty:l.qty,rate:l.rate,amt:l.amt}))};
+if(o.file)idbPut(j.id+':'+o.kind,o.file).catch(()=>{j.docs[o.kind].pdf=false;save&&save()});
+S.learned=(S.learned||0)+1;
+if(o.mode=='new'){V.pop=null;go('jobs',j.id);V.pop={k:'jedit',id:j.id};render();toast('Job created. Set the event date and check the details.')}else{V.pop=null;render();toast('Learned from this '+o.kind+'.')}}
+
+function del(id,k,i){J(id)[k].splice(i,1);render()}
+function outsrc(id,i){V.pop={k:'out',j:id,i};render()}
+function saveOut(){const o=V.pop,l=J(o.j).lines[o.i];l.out=true;l.ocost=+oc.value||0;l.sup=os.value.trim();V.pop=null;render()}
+const pad=n=>String(n).padStart(2,'0');
+const ld=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const dBetween=(a,b)=>Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/864e5);
+function dayInfo(date){const js=S.jobs.filter(j=>j.date==date&&counts(j)),setup=S.jobs.filter(j=>counts(j)&&j.sDate&&j.sDate<j.date&&j.sDate<=date&&date<j.date&&dBetween(j.sDate,j.date)<=14),gear={},crew={};
+[...js,...setup].forEach(j=>{j.lines.forEach(l=>{const g=gear[l.g]=gear[l.g]||{own:0,out:0};g[isOut(l)?'out':'own']+=l.q})});
+js.forEach(j=>{j.tasks.forEach(t=>t.assign.forEach(a=>{const c=crew[a.c]=crew[a.c]||{h:0,items:[]};if(a.role!='fix')c.h+=a.h;c.items.push({j,t,a})}))});
+let units=0,clash=false;Object.entries(gear).forEach(([k,v])=>{units+=v.own+v.out;if(v.own>G(k).qty)clash=true});
+return{js,setup,gear,crew,units,clash,ppl:Object.keys(crew).length}}
+const roleTxt=a=>a.role=='fix'?'fixed '+m(a.amt||0):(a.role=='op'?'operating ':'rigging ')+a.h+'h';
+function dayPanel(date){const I=dayInfo(date);
+const nice=new Date(date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const jobs=I.js.map(j=>`<div class="card" onclick="go('jobs',${j.id})"><div class="row"><b>${esc(jt(j))}</b><span class="mu">${j.status}${j.friend?' · friendly':''}</span></div>${j.event?`<div class="mu">${esc(j.event)}</div>`:''}</div>`).join('')+I.setup.map(j=>`<div class="card" onclick="go('jobs',${j.id})"><div class="row"><b>${esc(jt(j))}</b><span class="chip">Setup${j.sDate==date&&j.sTime?' '+j.sTime:''}</span></div><div class="mu">Equipment out for the event on ${dNice(j.date)}</div></div>`).join('');
+const jobsEmpty=!I.js.length&&!I.setup.length;
+const eqAll=S.gear.filter(g=>!g.arch).map(g=>{const v=I.gear[g.id]||{own:0,out:0},o=g.own==='out',used=v.own+v.out;
+if(!used)return{free:1,html:`<div class="card tcard free" style="--tc:${tcol(g)}"><div class="row"><span>${esc(g.name)}</span><span class="mu">${o?'on request':g.qty+' free'}</span></div></div>`};
+const over=!o&&v.own>g.qty;
+return{free:0,html:`<div class="card tcard" style="--tc:${tcol(g)}"><div class="row"><span>${esc(g.name)}</span><b style="${over?'color:var(--bad)':''}">${o?used+' · outsourced':v.own+' of '+g.qty+(over?' · over by '+(v.own-g.qty):' · '+(g.qty-v.own)+' free')}${!o&&v.out?' + '+v.out+' outsourced':''}</b></div></div>`}});
+const crAll=S.crew.filter(c=>!c.arch).map(c=>{const v=I.crew[c.id];
+if(!v)return{free:1,html:`<div class="card crc free"><div class="row"><span>${esc(c.name)}</span><span class="mu">free</span></div></div>`};
+return{free:0,html:`<div class="card crc"><div class="row"><b>${esc(c.name)}</b><span class="mu" style="${new Set(v.items.map(x=>x.j.id)).size>1?'color:var(--wa)':''}">${new Set(v.items.map(x=>x.j.id)).size>1?'⚠ '+new Set(v.items.map(x=>x.j.id)).size+' jobs · ':''}${v.h?v.h+'h':''}</span></div>${v.items.map(it=>`<div class="mu" onclick="go('jobs',${it.j.id})">${esc(it.j.client)} · ${esc(it.t.name||'task')} · ${roleTxt(it.a)}</div>`).join('')}</div>`}});
+const ord=(a,lb)=>{const u=a.filter(x=>!x.free),f=a.filter(x=>x.free);return(u.map(x=>x.html).join('')||'<div class="mu">None allocated</div>')+(f.length?`<details class="fd"><summary>${lb} (${f.length})</summary>${f.map(x=>x.html).join('')}</details>`:'')};
+return`<h2 style="text-transform:none;letter-spacing:0;font-size:15px;color:var(--tx)">${nice}</h2>${jobsEmpty?'<div class="mu">No jobs this day</div>':jobs}
+<h2><span class="dot eq"></span>Equipment</h2>${ord(eqAll,'Free equipment')}
+<h2><span class="dot cr"></span>Crew</h2>${ord(crAll,'Free crew')}`}
+function calGrid(){const [y,mo]=V.cm.split('-').map(Number),first=new Date(y,mo-1,1),lead=(first.getDay()+6)%7,days=new Date(y,mo,0).getDate(),today=ld(new Date());
+let c=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="wd">${d}</div>`).join('')+'<span class="cd em"></span>'.repeat(lead);
+for(let d=1;d<=days;d++){const date=y+'-'+pad(mo)+'-'+pad(d),I=dayInfo(date);
+c+=`<button class="cd ${date==V.date?'sel':''} ${date==today?'td':''} ${I.clash?'cl':''}" onclick="V.date='${date}';render()"><span class="dn">${d}</span>${I.units?`<span class="pl eq">${I.units} gear${I.clash?' !':''}</span>`:''}${I.ppl?`<span class="pl cr">${I.ppl} crew</span>`:''}</button>`}
+return`<div class="cal">${c}</div>`}
+function shiftMonth(n){const [y,mo]=V.cm.split('-').map(Number),d=new Date(y,mo-1+n,1);V.cm=d.getFullYear()+'-'+pad(d.getMonth()+1);render()}
+function availView(){if(!V.cm)V.cm=V.date.slice(0,7);
+const seg=[['cal','Calendar'],['day','Day']].map(([k,l])=>`<button class="${V.av==k?'p':''}" style="padding:4px 14px;font-size:13px" onclick="V.av='${k}';render()">${l}</button>`).join('');
+const [y,mo]=V.cm.split('-').map(Number),title=new Date(y,mo-1,1).toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+const head=`<div class="row" style="margin-bottom:12px"><h1 style="margin:0">Availability</h1><span style="display:flex;gap:6px">${seg}</span></div>`;
+if(V.av=='day')return head+`<input type="date" value="${V.date}" onchange="if(this.value){V.date=this.value;V.cm=this.value.slice(0,7)}render()">`+dayPanel(V.date);
+return head+`<div class="row" style="margin-bottom:8px"><button class="x" style="font-size:16px;padding:2px 12px" aria-label="Previous month" onclick="shiftMonth(-1)">‹</button><b>${title}</b><span style="display:flex;gap:6px"><button class="x" onclick="V.date=ld(new Date());V.cm=V.date.slice(0,7);render()">Today</button><button class="x" style="font-size:16px;padding:2px 12px" aria-label="Next month" onclick="shiftMonth(1)">›</button></span></div>`
++calGrid()+`<div class="mu" style="margin:8px 0 4px"><span class="dot eq"></span>Equipment <span class="dot cr" style="margin-left:10px"></span>Crew <span class="dot cl" style="margin-left:10px"></span>Equipment clash</div>`+dayPanel(V.date)}
+function fab(){return V.add?'':'<button class="fab" aria-label="Add" onclick="V.add=true;render()">+</button>'}
+const sheetTop=t=>`<div class="bd" onclick="V.add=false;render()"></div><div class="sheet"><div class="row" style="margin-bottom:4px"><b>${t}</b><button class="x" onclick="V.add=false;render()">✕</button></div>`;
+const isE=(k,id)=>V.edit===k+':'+id;
+function edj(id){V.edit=V.edit==='job:'+id?'':'job:'+id;render()}
+function ed(k,id){V.edit=isE(k,id)?'':k+':'+id;render()}
+function supDef(name,ex){const n=String(name||'').trim().toLowerCase();if(!n)return null;const a=S.gear.filter(g=>g.own=='out'&&g.id!=ex&&String(g.sup||'').trim().toLowerCase()==n);return a.length?a[a.length-1]:null}
+function fillSup(p){const d=supDef(document.getElementById(p+'s').value);if(!d)return;const md=d.costMode=='disc'?'disc':'eur';document.getElementById(p+'m').value=md;document.getElementById(p+'E').style.display=md=='eur'?'contents':'none';document.getElementById(p+'D').style.display=md=='disc'?'contents':'none';if(md=='disc')document.getElementById(p+'dc').value=d.disc||0;toast('Filled in from your earlier '+d.sup+' items',2500)}
+function supFillG(id){const g=S.gear.find(x=>x.id==id),d=supDef(g.sup,id);if(!d){return}g.costMode=d.costMode=='disc'?'disc':'eur';if(g.costMode=='disc')g.disc=d.disc||0;save();render();toast('Filled in from your earlier '+d.sup+' items',2500)}
+function fillOut(){const d=supDef(document.getElementById('os').value);if(!d||d.costMode!='disc')return;const l=J(V.pop.j).lines[V.pop.i];document.getElementById('oc').value=(lr(l)*(1-(d.disc||0)/100)).toFixed(2);toast('Filled in from your earlier '+d.sup+' items',2500)}
+function sups(){return [...new Set([...S.contacts.filter(c=>c.isVe).map(c=>c.name),...S.gear.map(g=>g.sup).filter(Boolean)])]}
+function btns(kind,id,delCode){return`<span style="white-space:nowrap"><button class="x" title="Edit" onclick="openEdit({k:'${kind}',id:${id}})">✎</button><button class="x" title="Delete" onclick="askDel('${({gedit:'gear',cedit:'crew',ctedit:'contact'})[kind]}',${id})">✕</button></span>`}
+function gearForm(g){return`<datalist id="sups">${sups().map(s=>`<option value="${esc(s)}">`).join('')}</datalist><div class="f"><div style="grid-column:1/-1"><label>Name</label><input value="${esc(g.name)}" onchange="updq('gear',${g.id},'name',this.value)"></div>
+<div style="grid-column:1/-1"><label>Category</label><div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:2px">${CATS.map(([k,l])=>chk((g.cats||[]).includes(k),`togCat(${g.id},'${k}',this.checked)`,dotL(k,l))).join('')}</div></div>
+<div><label>Type</label><select onchange="upd('gear',${g.id},'own',this.value)"><option value="owned" ${g.own!='out'?'selected':''}>Owned</option><option value="out" ${g.own=='out'?'selected':''}>Outsourced</option></select></div>
+<div><label>Qty owned</label><input type="number" value="${g.qty}" onchange="updq('gear',${g.id},'qty',this.value)"></div>
+<div><label>Default charge/day (€)</label><input type="number" value="${g.rate}" onchange="updq('gear',${g.id},'rate',this.value);gHint(${g.id})"></div>
+${g.own=='out'?`<div style="grid-column:1/-1"><label>Outsourced from</label><input list="sups" value="${esc(g.sup||'')}" placeholder="Supplier name" onchange="updq('gear',${g.id},'sup',this.value);supFillG(${g.id})"></div><div style="grid-column:1/-1"><label>Cost basis</label><select onchange="upd('gear',${g.id},'costMode',this.value)"><option value="eur" ${g.costMode!='disc'?'selected':''}>Fixed € per day</option><option value="disc" ${g.costMode=='disc'?'selected':''}>Discount off vendor price</option></select></div>
+${g.costMode=='disc'?`<div><label>Vendor price/day (€)</label><input type="number" value="${g.vprice||''}" placeholder="same as charge" onchange="updq('gear',${g.id},'vprice',this.value);gHint(${g.id})"></div><div><label>Discount (%)</label><input type="number" value="${g.disc||0}" onchange="updq('gear',${g.id},'disc',this.value);gHint(${g.id})"></div>`:`<div style="grid-column:1/-1"><label>Supplier cost (€ per day)</label><input type="number" value="${g.cost}" onchange="updq('gear',${g.id},'cost',this.value);gHint(${g.id})"></div>`}
+<div id="gh" class="mu" style="grid-column:1/-1">${hintTxt(g)}</div>`:''}</div>`}
+function setSort(k,v){if(k=='gear'){V.gs=v;V.gd=v=='rate'?-1:1}else{V.cs=v;V.cd=v=='rate'?-1:1}render()}
+function flipSort(k){if(k=='gear')V.gd=-V.gd;else V.cd=-V.cd;render()}
+function sortBar(k){const key=k=='gear'?V.gs:V.cs,dir=k=='gear'?V.gd:V.cd;
+return`<div class="row" style="margin-bottom:12px"><span class="mu">Sort by</span><span style="display:flex;gap:6px;align-items:center"><select style="width:auto" aria-label="Sort by" onchange="setSort('${k}',this.value)"><option value="type" ${key=='type'?'selected':''}>Type</option><option value="az" ${key=='az'?'selected':''}>A–Z</option><option value="rate" ${key=='rate'?'selected':''}>Rate</option></select><button class="x" style="font-size:16px;padding:4px 10px" aria-label="Reverse order" onclick="flipSort('${k}')">${dir>0?'↑':'↓'}</button></span></div>`}
+function togCat(id,k,on){const g=S.gear.find(x=>x.id==id),a=new Set(g.cats||[]);on?a.add(k):a.delete(k);g.cats=CATS.map(c=>c[0]).filter(x=>a.has(x));save()}
+function catBoxes(pf){return`<div style="grid-column:1/-1"><label>Category</label><div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:2px">${CATS.map(([k,l])=>chk(false,'',dotL(k,l)).replace('<input','<input id="'+pf+k+'"')).join('')}</div></div>`}
+function readCats(pf){return CATS.filter(([k])=>document.getElementById(pf+k).checked).map(c=>c[0])}
+const tcol=g=>(g.cats&&g.cats.length)?'var(--c-'+CATS.find(c=>g.cats.includes(c[0]))[0]+')':'var(--ln)';
+const dotL=(k,l)=>`<span class="dot" style="background:var(--c-${k});margin-right:0"></span>${l}`;
+const azs=(x,y)=>x.name.localeCompare(y.name,undefined,{sensitivity:'base'});
+function gearList(){const d=V.gd,a=S.gear.filter(g=>!g.arch),fc=g=>(g.cats&&g.cats.length)?CATS.findIndex(c=>g.cats.includes(c[0])):99;
+if(V.gs=='rate')a.sort((x,y)=>(x.rate-y.rate)*d||azs(x,y));else if(V.gs=='type')a.sort((x,y)=>(fc(x)-fc(y))*d||((x.own==='out')-(y.own==='out'))||azs(x,y));else a.sort((x,y)=>azs(x,y)*d);
+let h='',last=null;
+let po=null;a.forEach(g=>{if(V.gs=='type'){const k=fc(g);if(k!==last){po=null}const o=g.own==='out';if(k===last&&po===false&&o)h+='<div class="mu" style="display:flex;align-items:center;gap:8px;font-size:11px;margin:10px 2px 8px"><span style="flex:1;height:1px;background:var(--ln)"></span>Outsourced<span style="flex:1;height:1px;background:var(--ln)"></span></div>';po=o}
+if(V.gs=='type'){const k=fc(g);if(k!==last){last=k;h+=`<h2>${k==99?'Uncategorised':'<span class="dot" style="background:var(--c-'+CATS[k][0]+')"></span>'+CATS[k][1]}</h2>`}}
+h+=`<div class="sw"><div class="swa"><button onclick="dupItem('gear',${g.id})">Duplicate</button><button class="d" onclick="askDel('gear',${g.id})">Delete</button></div><div class="card tcard" style="--tc:${tcol(g)}" onclick="swTapE('gedit',${g.id})"><div class="row"><span><b>${esc(g.name)}</b> ${(g.cats||[]).map(k=>`<span class="chip tc" style="--tc:var(--c-${k})">${CATS.find(c=>c[0]==k)[1]}</span>`).join(' ')}</span></div><div class="mu">${g.own==='out'?'Outsourced'+(g.sup?' from '+esc(g.sup):'')+' · we pay '+gcLabel(g)+' · charge '+m(g.rate):'Owned · qty '+g.qty+' · charge '+m(g.rate)+'/day'}</div></div></div>`});
+return dupBanner('gear')+(h||'<div class="mu">No equipment yet.</div>')+archList('gear')}
+function gearView(){
+return`<h1>Equipment</h1>`+sortBar('gear')+gearList()+
+fab()+(V.add?sheetTop('Add item')+`<datalist id="sups">${sups().map(x=>`<option value="${esc(x)}">`).join('')}</datalist><div class="f"><div><label>Name</label><input id="gn"></div><div><label>Type</label><select id="gown" onchange="gx.style.display=this.value=='out'?'contents':'none'"><option value="owned">Owned</option><option value="out">Outsourced</option></select></div>
+<div><label>Quantity owned</label><input id="gq" type="number" value="1"></div><div><label>Default charge / day (€)</label><input id="gr" type="number" value="0"></div>
+${catBoxes('gcat')}
+<div id="gx" style="display:none"><div style="grid-column:1/-1"><label>Outsourced from</label><input id="gs" list="sups" placeholder="Supplier name" onchange="fillSup('g')"></div><div style="grid-column:1/-1"><label>Cost basis</label><select id="gm" onchange="gE.style.display=this.value=='eur'?'contents':'none';gD.style.display=this.value=='disc'?'contents':'none'"><option value="eur">Fixed € per day</option><option value="disc">Discount off vendor price</option></select></div><div id="gE" style="display:contents"><div style="grid-column:1/-1"><label>Supplier cost (€ per day)</label><input id="gc" type="number" value="0"></div></div><div id="gD" style="display:none"><div><label>Vendor price/day (€)</label><input id="gvp" type="number" placeholder="same as charge"></div><div><label>Discount (%)</label><input id="gdc" type="number" value="0"></div></div></div>
+<div style="grid-column:1/-1"><button class="p" style="width:100%" onclick="addGear()">Add</button></div></div></div>`:'')}
+function upd(k,id,f,v){const o=S[k].find(x=>x.id==id);o[f]=typeof o[f]=='number'?+v:v;render()}
+function addGear(){if(!gn.value.trim())return;S.gear.push({id:nid(S.gear),name:gn.value.trim(),own:gown.value,qty:+gq.value||0,rate:+gr.value||0,cost:gm.value=='eur'?+gc.value||0:0,costMode:gm.value,vprice:+gvp.value||0,disc:+gdc.value||0,sup:gs.value.trim(),cats:readCats('gcat')});V.add=false;render()}
+const cRig=p=>p.canRig!==false,cOp=p=>p.canOp!==false,cSame=p=>p.same===undefined?p.rig===p.op:p.same;
+function roleOpts(cid){const p=C(cid);return(cRig(p)?'<option value="rig">Rigging</option>':'')+(cOp(p)?'<option value="op">Operating</option>':'')}
+function roleSel(cid){return'<option value="">Role</option>'+(cid?roleOpts(cid).replace('<option','<option selected'):'')+'<option value="fix">Fixed amount</option>'}
+function crewSame(id,b){const p=C(id);p.same=b;if(b)p.op=p.rig;render()}
+function crewRate(id,v){const p=C(id);p.rig=p.op=+v;render()}
+const chk=(on,fn,label)=>`<label style="display:flex;gap:8px;align-items:center;font-size:14px;color:var(--tx)"><input type="checkbox" style="width:auto" ${on?'checked':''} onchange="${fn}">${label}</label>`;
+function crewForm(p){const r=cRig(p),o=cOp(p),sm=r&&o&&cSame(p);
+return`<div class="f" style="grid-template-columns:1fr 1fr"><div style="grid-column:1/-1"><label>Name</label><input value="${esc(p.name)}" onchange="updq('crew',${p.id},'name',this.value)"></div>
+${chk(r,`upd('crew',${p.id},'canRig',this.checked)`,'Rigging')}${chk(o,`upd('crew',${p.id},'canOp',this.checked)`,'Operating')}
+${r&&o?`<div style="grid-column:1/-1">${chk(sm,`crewSame(${p.id},this.checked)`,'Same rate for both')}</div>`:''}
+${sm?`<div style="grid-column:1/-1"><label>Rate €/h</label><input type="number" value="${p.rig}" onchange="crewRateQ(${p.id},this.value)"></div>`:`${r?`<div><label>Rigging €/h</label><input type="number" value="${p.rig}" onchange="updq('crew',${p.id},'rig',this.value)"></div>`:''}${o?`<div><label>Operating €/h</label><input type="number" value="${p.op}" onchange="updq('crew',${p.id},'op',this.value)"></div>`:''}`}</div>`}
+function crewList(){const d=V.cd,a=S.crew.filter(p=>!p.arch),ty=p=>cRig(p)&&cOp(p)?0:cOp(p)?1:cRig(p)?2:3,mx=p=>Math.max(cRig(p)?+p.rig||0:0,cOp(p)?+p.op||0:0),TL=['Rigging & operating','Operating only','Rigging only','No roles set'];
+if(V.cs=='rate')a.sort((x,y)=>(mx(x)-mx(y))*d||azs(x,y));else if(V.cs=='type')a.sort((x,y)=>(ty(x)-ty(y))*d||azs(x,y));else a.sort((x,y)=>azs(x,y)*d);
+let h='',last=null;
+a.forEach(p=>{if(V.cs=='type'){const k=ty(p);if(k!==last){last=k;h+=`<h2>${TL[k]}</h2>`}}
+const r=cRig(p),o=cOp(p),sm=r&&o&&cSame(p);
+const ow=S.jobs.filter(j=>!isUp(j)).reduce((x,j)=>x+Math.max(0,owedBy(j,p.id)-paidBy(j,p.id)),0),any=S.jobs.some(j=>owedBy(j,p.id)>0||paidBy(j,p.id)>0);
+h+=`<div class="sw"><div class="swa"><button onclick="dupItem('crew',${p.id})">Duplicate</button><button class="d" onclick="askDel('crew',${p.id})">Delete</button></div><div class="card" onclick="swTapE('cedit',${p.id})"><div class="row"><span style="display:flex;align-items:center;gap:6px"><b>${esc(p.name)}</b>${ow>0.004?`<button class="x" title="Unpaid: ${m(ow)}" aria-label="Unpaid ${m(ow)}" style="color:var(--wa);border-color:var(--wa)" onclick="event.stopPropagation();openPay(${p.id})">⚠</button>`:''}</span></div><div class="row" style="margin-top:2px"><span class="mu">${!r&&!o?'No roles set':sm?'Rigging & operating · '+m(p.rig)+'/h':[r?'Rigging '+m(p.rig)+'/h':'',o?'Operating '+m(p.op)+'/h':''].filter(Boolean).join(' · ')}</span></div></div></div>`});
+return dupBanner('crew')+(h||'<div class="mu">No crew yet.</div>')+archList('crew')}
+const owedBy=(j,cid)=>(j.tasks||[]).reduce((x,t)=>x+t.assign.filter(a=>a.c==cid).reduce((y,a)=>y+payOf(a),0),0);
+const PA=cid=>(S.payments||[]).filter(p=>p.c==cid);
+const paidBy=(j,cid)=>PA(cid).reduce((x,p)=>x+p.alloc.filter(a=>a.j==j.id).reduce((y,a)=>y+(+a.amt||0),0),0);
+const onAcct=cid=>PA(cid).reduce((x,p)=>x+(+p.amt||0)-p.alloc.filter(a=>S.jobs.some(j=>j.id==a.j)).reduce((y,a)=>y+(+a.amt||0),0),0);
+const payState=(j,cid)=>{const o=owedBy(j,cid),p=paidBy(j,cid);return o<=0.004&&p<=0?['','']:p>=o-0.005?['Paid','ok']:p>0?['Part paid','wa']:['Unpaid','bad']};
+const payLine=(p,jid)=>{const a=jid?p.alloc.filter(x=>x.j==jid).reduce((y,x)=>y+(+x.amt||0),0):p.amt;return m(a)+(jid&&a<p.amt-0.004?' of '+m(p.amt):'')+' on '+(p.date||'no date')+(p.ref?' · ref '+esc(p.ref):'')+' · '+(p.inv?'invoiced':'not invoiced')};
+const payRow=(j,cid,showJob)=>{const o=owedBy(j,cid),pd=paidBy(j,cid),st=payState(j,cid),pys=PA(cid).filter(p=>p.alloc.some(a=>a.j==j.id));
+return`<div class="card" style="margin-bottom:6px"><div class="row"><span>${showJob?'<b>'+esc(jt(j))+'</b> <span class="mu">'+j.date+'</span>':'<b>'+esc(C(cid).name)+'</b>'}</span><span class="chip ${st[1]}" style="color:inherit">${isUp(j)&&!pd?'Upcoming':st[0]}</span></div>
+<div class="row mu" style="margin-top:4px"><span>Owed ${m(o)} · paid ${m(pd)}${o-pd>0.004?' · <b>left '+m(o-pd)+'</b>':''}</span>${o-pd>0.004?`<button onclick="openPay(${cid},${j.id})">+ Payment</button>`:''}</div>
+${pys.length?`<div class="mu" style="margin-top:4px">${pys.map(p=>payLine(p,j.id)).join('<br>')}</div>`:''}</div>`};
+function openPay(cid,jid){V.pop={k:'pay',c:cid,j:jid||0};render();payAuto()}
+const payJobs=cid=>S.jobs.filter(j=>owedBy(j,cid)-paidBy(j,cid)>0.004).sort((a,b)=>a.date<b.date?-1:1);
+function payAuto(){const o=V.pop;let r=+document.getElementById('pyA').value||0;payJobs(o.c).sort((a,b)=>(b.id==o.j)-(a.id==o.j)).forEach(j=>{const e=document.getElementById('pal'+j.id),need=owedBy(j,o.c)-paidBy(j,o.c),x=Math.max(0,Math.min(r,need));e.value=x?x.toFixed(2):'';r-=x});payUpd()}
+function payUpd(){const o=V.pop,t=+document.getElementById('pyA').value||0;let a=0;payJobs(o.c).forEach(j=>{a+=+document.getElementById('pal'+j.id).value||0});const d=t-a,e=document.getElementById('pyS');e.textContent=Math.abs(d)<0.005?'Fully assigned':d>0?m(d)+' not assigned to a job (kept on account)':'Assigned '+m(-d)+' more than the payment';e.style.color=d<-0.005?'var(--bad)':''}
+function addPay(){const o=V.pop,t=+document.getElementById('pyA').value;if(!(t>0))return;const al=[];payJobs(o.c).forEach(j=>{const x=+document.getElementById('pal'+j.id).value||0;if(x>0)al.push({j:j.id,amt:x})});if(al.reduce((x,y)=>x+y.amt,0)>t+0.005){payUpd();return}
+S.payments=S.payments||[];S.payments.push({id:nid(S.payments),c:o.c,amt:t,date:document.getElementById('pyD').value,ref:document.getElementById('pyR').value.trim(),inv:document.getElementById('pyI').value=='1',alloc:al});V.pop=null;render()}
+function payPop(){const o=V.pop,js=payJobs(o.c),tot=js.reduce((x,j)=>x+owedBy(j,o.c)-paidBy(j,o.c),0),pre=o.j?(owedBy(J(o.j),o.c)-paidBy(J(o.j),o.c)):tot;
+return`<div class="mu" style="margin-bottom:8px">Still owed to ${esc(C(o.c).name)}: ${m(tot)}</div>
+<div class="f"><div><label>Amount (€)</label><input id="pyA" type="number" step="0.01" value="${pre.toFixed(2)}" onchange="payAuto()"></div><div><label>Payment date</label><input id="pyD" type="date" value="${today()}"></div>
+<div><label>Ref / invoice no.</label><input id="pyR" placeholder="Optional"></div><div><label>Crew member invoiced?</label><select id="pyI"><option value="0">Not invoiced</option><option value="1">Invoiced</option></select></div></div>
+<h2 style="margin-top:14px">Assign to jobs</h2>${js.length?js.map(j=>{const nd=owedBy(j,o.c)-paidBy(j,o.c);return`<div class="row" style="margin-bottom:6px;gap:8px"><span style="flex:1"><b>${esc(jt(j))}</b><div class="mu">${j.date} · left ${m(nd)}</div></span><input id="pal${j.id}" type="number" step="0.01" style="width:96px" oninput="payUpd()"></div>`}).join(''):'<div class="mu">No unpaid jobs for this person. The payment will be kept on account.</div>'}
+<div id="pyS" class="mu" style="margin:6px 0"></div><button class="p" style="width:100%" onclick="addPay()">Add payment</button>`}
+function crewPayView(){const rows=S.crew.map(c=>{const js=S.jobs.filter(j=>owedBy(j,c.id)>0||paidBy(j,c.id)>0);let out=0,paid=0,up=0;js.forEach(j=>{const o=owedBy(j,c.id),pd=paidBy(j,c.id);paid+=pd;if(isUp(j))up+=Math.max(0,o-pd);else out+=Math.max(0,o-pd)});return{c,js:js.sort((a,b)=>a.date<b.date?1:-1),out,paid,up,ac:onAcct(c.id)}}).filter(r=>r.js.length||PA(r.c.id).length);
+const tot=rows.reduce((x,r)=>x+r.out,0);
+return`<div class="card"><div class="mu">Total you owe crew</div><div class="big">${m(tot)}</div><div class="mu">on completed jobs · ${m(rows.reduce((x,r)=>x+r.up,0))} more on upcoming jobs</div></div><button class="p" style="width:100%;margin-bottom:8px" onclick="V.pop={k:'paywho'};render()">+ Add payment</button>`+(rows.length?rows.sort((a,b)=>b.out-a.out).map(r=>{const open=V.cpx==r.c.id;return`<h2 style="cursor:pointer;display:flex;justify-content:space-between" onclick="V.cpx=${open?0:r.c.id};render()"><span>${esc(r.c.name)}</span><span>${m(r.out)} ${open?'⌄':'›'}</span></h2><div class="mu" style="margin:-6px 0 6px">paid ${m(r.paid)}${r.up?' · upcoming '+m(r.up):''}${r.ac>0.004?' · on account '+m(r.ac):''}</div>${open?r.js.map(j=>payRow(j,r.c.id,true)).join('')+(PA(r.c.id).length?'<div class="mu" style="margin:10px 0 4px">All payments</div>'+PA(r.c.id).slice().reverse().map(p=>`<div class="card" style="margin-bottom:6px"><div class="row"><span>${payLine(p)}</span><button class="x" onclick="askDel('pay',${p.id})">✕</button></div>${p.alloc.length?'<div class="mu">'+p.alloc.map(a=>esc(jt(J(a.j)||{event:'Deleted job'}))+' '+m(a.amt)).join(' · ')+'</div>':'<div class="mu">On account, not assigned to a job</div>'}</div>`).join(''):''):''}`}).join(''):'<div class="mu">No crew assigned to any task yet.</div>')}
+
+// ---- home: priority at a glance ----
+const hd=n=>{const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+n);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+const dLab=ds=>ds==today()?'Today':ds==hd(1)?'Tomorrow':new Date(ds+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long'});
+const dNice=ds=>new Date(ds+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+function retRow(j){const ls=j.lines.filter(l=>isOut(l)&&!l.ret);return`<div class="row" style="padding:6px 0;border-top:1px solid var(--ln);gap:8px"><span style="cursor:pointer" onclick="event.stopPropagation();go('jobs',${j.id})"><b>${esc(jt(j))}</b><div class="mu">${dNice(j.date)} · ${ls.map(l=>l.q+' × '+esc(G(l.g).name)+' ('+esc(l.sup||G(l.g).sup||'supplier')+')').join(', ')}</div></span><button onclick="event.stopPropagation();markRet(${j.id})">Returned</button></div>`}
+function markRet(id){J(id).lines.forEach(l=>{if(isOut(l))l.ret=true});render()}
+function hxTog(k){V.hx=V.hx==k?'':k;render()}
+function homeView(){const t0=today(),days=[...Array(7)].map((_,i)=>hd(i));
+const crewNames=t=>t.assign.map(a=>esc(C(a.c).name)).join(', ');
+let wk='',n=0;
+days.forEach(d=>{const it=[];S.jobs.filter(j=>j.date==d).forEach(j=>it.push({j,k:'e',tm:j.time||'99'}));S.jobs.filter(j=>j.sDate==d&&j.sDate!=j.date).forEach(j=>it.push({j,k:'s',tm:j.sTime||'99'}));
+if(!it.length)return;it.sort((a,b)=>a.tm<b.tm?-1:a.tm>b.tm?1:0);n+=it.length;
+wk+=`<div class="mu" style="margin:12px 0 4px"><b style="color:var(--tx)">${dLab(d)}</b> · ${dNice(d)}</div>`+it.map(({j,k})=>{const tk=k=='e'?(j.tasks||[]):[];
+return`<div class="card" style="cursor:pointer;margin-bottom:6px" onclick="go('jobs',${j.id})"><div class="row"><span><b>${esc(jt(j))}</b><div class="mu">${j.event?esc(j.client)+' · ':''}${k=='s'?'Setup'+(j.sTime?' '+j.sTime:'')+' · event '+dNice(j.date):(j.time?j.time+(j.tEnd?'–'+j.tEnd:'')+' · ':'')+cn(j)}${j.loc?' · '+esc(j.loc):''}</div></span><span class="chip">${j.friend?'Friendly':k=='s'?'Setup':j.status}</span></div>
+${tk.length?`<div style="margin-top:6px">${tk.map(t=>`<div class="mu" style="display:flex;justify-content:space-between;gap:8px"><span>${esc(t.name||'Task')}</span><span style="${t.assign.length?'':'color:var(--wa)'}">${t.assign.length?crewNames(t):'unassigned'}</span></div>`).join('')}</div>`:''}</div>`}).join('')});
+if(!n){const nx=S.jobs.filter(j=>j.date>days[6]).sort((a,b)=>a.date<b.date?-1:1)[0];wk=`<div class="card"><div class="mu">Nothing scheduled in the next 7 days.</div>${nx?`<div class="row" style="margin-top:6px;cursor:pointer" onclick="go('jobs',${nx.id})"><span>Next: <b>${esc(jt(nx))}</b></span><span class="mu">${dNice(nx.date)} ›</span></div>`:''}</div>`}
+// attention
+const A=[],soon=[...Array(14)].map((_,i)=>hd(i)),real=S.jobs.filter(j=>!j.friend),ds=x=>dBetween(x,today()),tot=a=>a.reduce((x,j)=>{const c=calc(j);return x+c.rev+c.vatAmt},0);
+const clash=soon.filter(d=>dayInfo(d).clash);
+if(clash.length){const g=new Set();clash.forEach(d=>{const I=dayInfo(d);Object.entries(I.gear).forEach(([id,v])=>{if(v.own>G(id).qty)g.add(G(id).name)})});A.push({k:'clash',t:'Equipment over-booked',s:clash.length+' day'+(clash.length>1?'s':'')+' in the next 2 weeks · '+[...g].slice(0,3).map(esc).join(', ')+' (setup days included)',c:'bad',go:`V.date='${clash[0]}';V.cm='${clash[0].slice(0,7)}';V.av='day';go('avail')`})}
+const mins=t=>{const q=String(t||'').match(/^(\d{1,2}):(\d{2})/);return q?+q[1]*60+ +q[2]:null};
+const ovl=(a,b)=>{let a1=mins(a.time),a2=mins(a.tEnd),b1=mins(b.time),b2=mins(b.tEnd);if(a1==null||b1==null)return null;if(a2==null)a2=a1+240;if(b2==null)b2=b1+240;if(a2<=a1)a2+=1440;if(b2<=b1)b2+=1440;return a1<b2&&b1<a2};
+const dbl=[];soon.forEach(d=>{const by={};S.jobs.filter(j=>j.date==d&&counts(j)).forEach(j=>(j.tasks||[]).forEach(t=>t.assign.forEach(a=>{(by[a.c]=by[a.c]||new Map()).set(j.id,j)})));
+Object.entries(by).forEach(([c,mp])=>{const js=[...mp.values()];if(js.length<2)return;let sure=false,unk=false;for(let i=0;i<js.length;i++)for(let k=i+1;k<js.length;k++){const o=ovl(js[i],js[k]);if(o===true)sure=true;else if(o===null)unk=true}if(sure||unk)dbl.push({c,d,js,sure})})});
+if(dbl.length){const seen=new Map();dbl.forEach(x=>x.js.forEach(j=>seen.set(j.id,j)));A.push({k:'dbl',t:'Crew double-booked',s:dbl.slice(0,3).map(x=>esc(C(x.c).name)+' · '+dNice(x.d)+(x.sure?'':' (check times)')).join(', ')+(dbl.length>3?' +'+(dbl.length-3):''),jobs:[...seen.values()],c:dbl.some(x=>x.sure)?'bad':'wa'})}
+const od=real.filter(j=>j.status=='Invoiced'&&j.iDate&&ds(j.iDate)>30).sort((a,b)=>a.iDate<b.iDate?-1:1);
+if(od.length)A.push({k:'od',t:'Overdue invoices (30+ days)',s:od.length+' · '+m(tot(od))+' · oldest '+ds(od[0].iDate)+' days',jobs:od,sub:j=>ds(j.iDate)+' days since invoice · '+m(calc(j).rev+calc(j).vatAmt),c:'bad'});
+const fu=real.filter(j=>j.status=='Quoted'&&isUp(j)&&j.qDate&&ds(j.qDate)>7).sort((a,b)=>a.qDate<b.qDate?-1:1);
+if(fu.length)A.push({k:'fu',t:'Quotes to follow up',s:fu.length+' sent over a week ago · '+m(fu.reduce((x,j)=>x+calc(j).rev,0))+' excl. VAT',jobs:fu,sub:j=>'quoted '+ds(j.qDate)+' days ago',c:'wa'});
+const nocrew=S.jobs.filter(j=>soon.includes(j.date)&&!isBk(j)&&!(j.tasks||[]).some(t=>t.assign.length));
+if(nocrew.length)A.push({k:'nocrew',t:'No crew assigned',s:'Within 2 weeks',jobs:nocrew,c:'wa'});
+const noeq=S.jobs.filter(j=>soon.includes(j.date)&&!(j.lines||[]).length&&!isBk(j));
+if(noeq.length)A.push({k:'noeq',t:'No equipment added',s:'Within 2 weeks',jobs:noeq,c:'wa'});
+const back=S.jobs.filter(j=>j.date<t0&&j.date>=hd(-30)&&(j.lines||[]).some(l=>isOut(l)&&!l.ret)).sort((a,b)=>a.date<b.date?-1:1);
+if(back.length){const vs=new Set(),nI=back.reduce((x,j)=>x+j.lines.filter(l=>isOut(l)&&!l.ret).reduce((y,l)=>{vs.add(l.sup||G(l.g).sup||'supplier');return y+l.q},0),0);
+A.push({k:'ret',t:'Outsourced gear to return',s:nI+' item'+(nI>1?'s':'')+' · '+[...vs].slice(0,3).map(esc).join(', '),jobs:back,c:'wa',act:true})}
+const toInv=real.filter(j=>!isUp(j)&&j.status=='Delivered');
+if(toInv.length)A.push({k:'toinv',t:'Delivered, not invoiced',s:toInv.length+' job'+(toInv.length>1?'s':'')+' · '+m(tot(toInv))+' incl. VAT',jobs:toInv,c:'wa'});
+const unpaid=real.filter(j=>j.status=='Invoiced'),pend=unpaid.filter(j=>!od.includes(j));
+const ucol=tot(unpaid);
+if(pend.length)A.push({k:'unpaid',t:'Waiting to be paid',s:pend.length+' invoice'+(pend.length>1?'s':'')+' · '+m(tot(pend)),jobs:pend.sort((a,b)=>a.date<b.date?-1:1),sub:j=>j.iDate?ds(j.iDate)+' days since invoice':'',c:'wa'});
+let owed=0,owedP=0;S.crew.forEach(c=>{let o=0;S.jobs.filter(j=>!isUp(j)).forEach(j=>{o+=Math.max(0,owedBy(j,c.id)-paidBy(j,c.id))});if(o>0.004){owed+=o;owedP++}});
+if(owed>0.004)A.push({k:'owed',t:'You owe crew',s:m(owed)+' · '+owedP+' person'+(owedP>1?'s':''),c:'wa',go:"go('pay')"});
+const qd=real.filter(j=>j.status=='Quoted'&&isUp(j)&&!fu.includes(j));
+if(qd.length)A.push({k:'quoted',t:'Quotes awaiting an answer',s:qd.length+' · '+m(qd.reduce((x,j)=>x+calc(j).rev,0))+' excl. VAT',jobs:qd.sort((a,b)=>a.date<b.date?-1:1),sub:j=>j.qDate?'quoted '+ds(j.qDate)+' days ago':'',c:''});
+const dups=['gear','crew','contact'].map(k=>[k,findDups(k).length]).filter(x=>x[1]);
+if(dups.length){const [k]=dups[0],tt=dups.reduce((x,y)=>x+y[1],0);A.push({k:'dups',t:'Possible duplicates',s:tt+' to review',c:'',go:`go('${k=='contact'?'contacts':k}');openMerge('${k}')`})}
+if(!ghOk())A.push({k:'bk',t:'Back up your data',s:'Your data lives only on this device. Set up GitHub backup.',c:'wa',go:"V.pop={k:'bk'};render()"});else if(ghCfg().err&&Date.now()-(ghCfg().last||0)>864e5)A.push({k:'bk',t:'Backup is failing',s:'Last backup over a day ago. Tap to check.',c:'bad',go:"V.pop={k:'bk'};render()"});
+const arow=a=>{const open=V.hx==a.k,ex=a.jobs&&a.jobs.length;return`<div class="card" style="cursor:pointer;margin-bottom:6px" onclick="${ex?`hxTog('${a.k}')`:a.go}"><div class="row"><span><span style="color:var(--${a.c||'mu'})">●</span> <b>${a.t}</b><div class="mu">${a.s}</div></span><span class="mu">${ex?(open?'⌄':'›'):'›'}</span></div>${open&&ex?a.jobs.slice(0,8).map(j=>a.act?retRow(j):cxJobRow(j,a.sub?a.sub(j):'')).join(''):''}</div>`};
+// stats
+const done=S.jobs.filter(j=>!isUp(j)&&!j.friend),yr=t0.slice(0,4),mo=t0.slice(0,7),sm=a=>a.reduce((x,j)=>x+calc(j).p,0),sr=a=>a.reduce((x,j)=>x+calc(j).rev,0);
+const dy=done.filter(j=>j.date.slice(0,4)==yr),dm=done.filter(j=>j.date.slice(0,7)==mo),pipe=real.filter(j=>isUp(j));
+const tile=(l,v,sub,go)=>`<div class="card" style="margin:0;padding:10px;${go?'cursor:pointer':''}" ${go?`onclick="${go}"`:''}><div class="mu" style="font-size:11px">${l}</div><div style="font-weight:600;font-size:15px">${v}</div>${sub?`<div class="mu" style="font-size:11px">${sub}</div>`:''}</div>`;
+const ry=sr(dy),py=sm(dy);
+const tiles=[tile('Profit · this month',m(sm(dm)),dm.length+' job'+(dm.length==1?'':'s'),"go('profit')"),tile('Profit · '+yr,m(py),ry?Math.round(py/ry*100)+'% margin':'',"go('profit')"),tile('Avg / job',m(dy.length?py/dy.length:0),dy.length+' done in '+yr,"go('profit')"),
+tile('Pipeline',m(sr(pipe)),pipe.length+' upcoming',"go('jobs')"),tile('To collect',m(ucol),unpaid.length+' invoice'+(unpaid.length==1?'':'s'),"go('jobs')"),tile('Owed to crew',m(owed),owedP?owedP+' person'+(owedP>1?'s':''):'settled',"go('pay')")].join('');
+const dn=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+return`<div class="mu" style="margin-bottom:2px">${dn}</div><h1 style="margin-top:0">Home</h1>
+<div class="row"><h2 style="margin:0">This week</h2><span class="mu">${n} item${n==1?'':'s'}</span></div>${wk}
+<h2 style="margin-top:20px">Needs attention</h2>${A.length?A.map(arow).join(''):'<div class="card"><div class="mu">All clear. Nothing needs your attention.</div></div>'}
+<h2 style="margin-top:20px">At a glance</h2><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">${tiles}</div><div class="mu" style="margin:8px 0">Friendly jobs are not included.</div>`}
+function payView(){return`<h1>Payments</h1>`+crewPayView()}
+function crewView(){const hd=`<h1>Crew</h1>`;return hd+sortBar('crew')+crewList()+
+fab()+(V.add?sheetTop('Add person')+`<div class="f"><div style="grid-column:1/-1"><label>Name</label><input id="pn"></div>
+<div>${chk(true,"prw.style.display=this.checked?'block':'none'",'Rigging').replace('<input','<input id="pcr"')}<div id="prw" style="margin-top:6px"><label>Rigging €/h</label><input id="pr" type="number" value="0"></div></div>
+<div>${chk(true,"pow.style.display=this.checked?'block':'none'",'Operating').replace('<input','<input id="pco"')}<div id="pow" style="margin-top:6px"><label>Operating €/h</label><input id="po" type="number" value="0"></div></div>
+<div style="grid-column:1/-1"><button class="p" style="width:100%" onclick="addCrew()">Add</button></div></div></div>`:'')}
+function addCrew(){if(!pn.value.trim())return;const r=pcr.checked,o=pco.checked,a=+pr.value||0,b=+po.value||0;S.crew.push({id:nid(S.crew),name:pn.value.trim(),canRig:r,canOp:o,rig:a,op:o?b:a,same:r&&o&&a==b});V.add=false;render()}
+const jobMatches=(j,c)=>j.cid==c.id||(!j.cid&&String(j.client).trim().toLowerCase()==c.name.trim().toLowerCase());
+function pickClient(jid,v){const j=J(jid);if(v=='new'){V.pop={k:'cnew',cl:true,ve:false,ret:{k:'jedit',id:jid,isNew:!!(V.pop&&V.pop.isNew)}};render();return}
+if(!v)return;const c=S.contacts.find(x=>x.id==+v);j.cid=c.id;j.client=c.name;render()}
+function saveNewContact(){const n=ncn.value.trim();if(!n){ncn.focus();ncn.placeholder='Name required';return}
+const c={id:nid(S.contacts),name:n,isCl:ncc.checked,isVe:ncv.checked,phone:nph.value.trim(),email:nem.value.trim(),notes:nno.value.trim()};
+if(!c.isCl&&!c.isVe)c.isCl=true;
+S.contacts.push(c);const r=V.pop.ret;
+if(r&&r.k=='jedit'&&c.isCl){const j=J(r.id);j.cid=c.id;j.client=c.name}
+if(r&&r.k=='doc'&&c.isCl){r.cl=String(c.id);r.newName=null}
+V.pop=r||null;render()}
+function cxTog(id){V.cx=V.cx==id?0:id;render()}
+function cxJobRow(j,sub){return`<div class="row" style="padding:6px 0;border-top:1px solid var(--ln);cursor:pointer" onclick="event.stopPropagation();go('jobs',${j.id})"><span><b>${esc(jt(j))}</b><div class="mu">${j.date}${sub?' · '+sub:''}</div></span><span class="mu">${j.friend?'Friendly':isUp(j)?'Upcoming':j.status} ›</span></div>`}
+function cxLinks(c){const nm=c.name.trim().toLowerCase(),js=S.jobs.filter(j=>jobMatches(j,c)).sort((a,b)=>a.date<b.date?1:-1);let h='<div style="margin-top:10px">';
+if(c.isCl)h+=`<div class="mu"><b>Jobs (${js.length})</b></div>`+(js.length?js.map(j=>cxJobRow(j,j.cat?cn(j):'')).join(''):'<div class="mu" style="padding:4px 0">No jobs yet</div>');
+if(c.isVe){const items=S.gear.filter(g=>g.sup&&g.sup.trim().toLowerCase()==nm);
+const vj=S.jobs.map(j=>({j,ls:(j.lines||[]).filter(l=>isOut(l)&&String(l.sup||G(l.g).sup||'').trim().toLowerCase()==nm)})).filter(x=>x.ls.length).sort((a,b)=>a.j.date<b.j.date?1:-1);
+h+=`<div class="mu" style="margin-top:${c.isCl?10:0}px"><b>Equipment supplied (${items.length})</b></div>`+(items.length?items.map(g=>`<div class="row" style="padding:6px 0;border-top:1px solid var(--ln);cursor:pointer" onclick="event.stopPropagation();go('gear')"><span>${esc(g.name)}${g.arch?' <span class="chip">archived</span>':''}</span><span class="mu">${gcLabel(g)}/day ›</span></div>`).join(''):'<div class="mu" style="padding:4px 0">No equipment linked</div>');
+h+=`<div class="mu" style="margin-top:10px"><b>Used on jobs (${vj.length})</b></div>`+(vj.length?vj.map(x=>cxJobRow(x.j,x.ls.map(l=>l.q+' × '+esc(G(l.g).name)).join(', '))).join(''):'<div class="mu" style="padding:4px 0">Not used on any job yet</div>')}
+return h+'</div>'}
+function contactForm(c){return`<div class="f"><div style="grid-column:1/-1"><label>Name</label><input value="${esc(c.name)}" onchange="updq('contacts',${c.id},'name',this.value)"></div>
+${chk(c.isCl,`updq('contacts',${c.id},'isCl',this.checked)`,'Client')}${chk(c.isVe,`updq('contacts',${c.id},'isVe',this.checked)`,'Vendor')}
+<div><label>Phone</label><input type="tel" value="${esc(c.phone||'')}" onchange="updq('contacts',${c.id},'phone',this.value)"></div>
+<div><label>Email</label><input type="email" value="${esc(c.email||'')}" onchange="updq('contacts',${c.id},'email',this.value)"></div>
+<div style="grid-column:1/-1"><label>Notes</label><input value="${esc(c.notes||'')}" onchange="updq('contacts',${c.id},'notes',this.value)"></div></div>`}
+function contactsView(){const f=V.cf||'all';
+const tabs=[['all','All'],['client','Clients'],['vendor','Vendors']].map(([k,l])=>`<button class="${f==k?'p':''}" style="padding:4px 14px;font-size:13px" onclick="V.cf='${k}';render()">${l}</button>`).join('');
+const list=S.contacts.filter(c=>f=='all'||(f=='client'?c.isCl:c.isVe)).sort((a,b)=>a.name.localeCompare(b.name)).map(c=>{
+const js=S.jobs.filter(j=>jobMatches(j,c)),inv=js.filter(j=>!j.friend&&!isUp(j)),pr=inv.reduce((a,j)=>a+calc(j).p,0);
+const items=S.gear.filter(g=>g.sup&&g.sup.trim().toLowerCase()==c.name.trim().toLowerCase()).length;
+const info=[c.isCl?(js.length?js.length+' job'+(js.length>1?'s':'')+(inv.length?' · '+m(pr)+' profit':''):'No jobs yet'):'',c.isVe?(items?items+' item'+(items>1?'s':'')+' supplied':'No equipment linked'):''].filter(Boolean).join(' · ');
+const ct=[c.phone,c.email].filter(Boolean).map(esc).join(' · ');
+const open=V.cx==c.id;
+return`<div class="card" style="cursor:pointer" onclick="if(!event.target.closest('button,a'))cxTog(${c.id})"><div class="row"><span><b>${esc(c.name)}</b> ${c.isCl?'<span class="chip">client</span>':''} ${c.isVe?'<span class="chip">vendor</span>':''}</span>${btns('ctedit',c.id,'')}</div><div class="mu">${info}</div>${ct?`<div class="mu">${ct}</div>`:''}${c.notes?`<div class="mu">${esc(c.notes)}</div>`:''}${open?cxLinks(c):''}</div>`}).join('')||'<div class="mu">Nothing here yet. Tap + to add one.</div>';
+return`<h1>Clients &amp; vendors</h1><div style="display:flex;gap:8px;margin-bottom:12px">${tabs}</div>`+dupBanner('contact')+list+(V.pop?'':`<button class="fab" aria-label="Add contact" onclick="V.pop={k:'cnew',cl:V.cf!='vendor',ve:V.cf=='vendor'};render()">+</button>`)}
+V.st=V.st||'over';V.yr=V.yr||'all';
+const STT=[['over','Overview'],['month','Monthly'],['client','Clients'],['cat','Categories'],['gear','Equipment'],['crew','Crew'],['jobs','All jobs']];
+function menuView(){let owed=0;S.crew.forEach(c=>S.jobs.filter(j=>!isUp(j)).forEach(j=>{owed+=Math.max(0,owedBy(j,c.id)-paidBy(j,c.id))}));
+const it=[['crew','Crew','People, roles and hourly rates',''],['pay','Payments',owed>0.004?'You owe crew '+m(owed):'Crew payments, all settled',''],['tasks','Task list','Roles and jobs you usually do',''],['profit','Stats','Profit and analytics',''],['contacts','Clients & vendors','Contacts, phone and email','']];
+return`<h1>Menu</h1>`+it.map(([k,l,d])=>`<div class="card" style="cursor:pointer" onclick="go('${k}')"><div class="row"><span><b>${l}</b><div class="mu">${d}</div></span><span class="mu">›</span></div></div>`).join('')+`<div class="card" style="cursor:pointer" onclick="V.pop={k:'bk'};render()"><div class="row"><span><b>Backup &amp; restore</b><div class="mu">Copy or restore all your data</div></span><span class="mu">›</span></div></div>`+(()=>{try{const x=JSON.parse(localStorage.getItem('evtapp_premerge'));return x?`<div class="card" style="cursor:pointer" onclick="V.pop={k:'undomerge'};render()"><div class="row"><span><b>Undo last merge</b><div class="mu">Saved ${new Date(x.t).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div></span><span class="mu">›</span></div></div>`:''}catch(e){return''}})()}
+// ---- duplicate detection & safe merge ----
+const dpKey=(k,a,b)=>k+':'+Math.min(a,b)+'-'+Math.max(a,b);
+const dpList=k=>k=='gear'?S.gear.filter(x=>!x.arch):k=='crew'?S.crew.filter(x=>!x.arch):S.contacts;
+const dpSame=(a,b)=>{const x=norm(a),y=norm(b);return !!x&&(x==y||x.replace(/ /g,'')==y.replace(/ /g,'')||sim(a,b)>=0.95&&toks(a).length==toks(b).length)};
+function findDups(k){const l=dpList(k),out=[];for(let i=0;i<l.length;i++)for(let j=i+1;j<l.length;j++)if(dpSame(l[i].name,l[j].name)&&!(S.nodup||[]).includes(dpKey(k,l[i].id,l[j].id)))out.push([l[i].id,l[j].id]);return out}
+function dupBanner(k){const n=findDups(k).length;return n?`<div class="card" style="border-color:var(--wa);cursor:pointer" onclick="openMerge('${k}')"><div class="row"><span>⚠ <b>${n} possible duplicate${n>1?'s':''}</b><div class="mu">Review and merge safely</div></span><span class="mu">Review ›</span></div></div>`:''}
+function openMerge(k){const d=findDups(k)[0];if(!d){V.pop=null;render();return}V.pop={k:'merge',kind:k,a:d[0],b:d[1],keep:d[0],ack:false};render()}
+const dpItem=(k,id)=>k=='gear'?G(id):k=='crew'?C(id):S.contacts.find(x=>x.id==id);
+function dpJobs(k,id){if(k=='contact'){const c=S.contacts.find(x=>x.id==id);return S.jobs.filter(j=>jobMatches(j,c))}return refJobs(k,id)}
+function dpInfo(k,x){if(k=='gear')return(x.own==='out'?'Outsourced'+(x.sup?' from '+esc(x.sup):'')+' · we pay '+gcLabel(x):'Owned · qty '+x.qty)+' · charge '+m(x.rate)+'/day';
+if(k=='crew'){const r=cRig(x),o=cOp(x);return !r&&!o?'No roles set':r&&o&&cSame(x)?'Rigging & operating · '+m(x.rig)+'/h':[r?'Rigging '+m(x.rig)+'/h':'',o?'Operating '+m(x.op)+'/h':''].filter(Boolean).join(' · ')}
+return[x.isCl?'Client':'',x.isVe?'Vendor':'',x.phone,x.email].filter(Boolean).map(esc).join(' · ')||'No details'}
+function doMerge(k,keep,drop){const K=dpItem(k,keep),D=dpItem(k,drop);
+if(k=='gear'){S.jobs.forEach(j=>(j.lines||[]).forEach(l=>{if(l.g==drop)l.g=keep}));K.cats=[...new Set([...(K.cats||[]),...(D.cats||[])])];if(!K.sup&&D.sup)K.sup=D.sup;Object.keys(S.alias).forEach(a=>{const v=S.alias[a];if(v&&v.t=='gear'&&v.id==drop)v.id=keep});S.gear=S.gear.filter(x=>x.id!=drop)}
+else if(k=='crew'){S.jobs.forEach(j=>(j.tasks||[]).forEach(t=>t.assign.forEach(a=>{if(a.c==drop)a.c=keep})));(S.payments||[]).forEach(p=>{if(p.c==drop)p.c=keep});S.crew=S.crew.filter(x=>x.id!=drop)}
+else{S.jobs.forEach(j=>{if(jobMatches(j,D)){j.cid=keep;j.client=K.name}});S.gear.forEach(g=>{if(g.sup&&g.sup.trim().toLowerCase()==D.name.trim().toLowerCase())g.sup=K.name});S.jobs.forEach(j=>(j.lines||[]).forEach(l=>{if(l.sup&&l.sup.trim().toLowerCase()==D.name.trim().toLowerCase())l.sup=K.name}));
+K.isCl=K.isCl||D.isCl;K.isVe=K.isVe||D.isVe;['phone','email','notes'].forEach(f=>{if(!K[f]&&D[f])K[f]=D[f]});Object.keys(S.alias).forEach(a=>{const v=S.alias[a];if(v&&v.t=='client'&&v.id==drop)v.id=keep});S.contacts=S.contacts.filter(x=>x.id!=drop)}}
+function mergeGo(){const o=V.pop,drop=o.keep==o.a?o.b:o.a;try{localStorage.setItem('evtapp_premerge',JSON.stringify({t:new Date().toISOString(),s:S}))}catch(e){}
+const nm=dpItem(o.kind,drop).name,kn=dpItem(o.kind,o.keep).name;doMerge(o.kind,o.keep,drop);V.pop=null;render();const n=findDups(o.kind).length;toast('Merged "'+nm+'" into "'+kn+'".'+(n?' '+n+' more possible duplicate'+(n>1?'s':'')+'.':''),5000)}
+function mergeIgnore(){const o=V.pop;S.nodup.push(dpKey(o.kind,o.a,o.b));V.pop=null;render();if(findDups(o.kind).length)openMerge(o.kind)}
+function undoMerge(){try{const x=JSON.parse(localStorage.getItem('evtapp_premerge'));S=x.s;S.alias=S.alias||{};S.payments=S.payments||[];S.nodup=S.nodup||[];localStorage.removeItem('evtapp_premerge');V.pop=null;render();toast('Merge undone. Your data is back as it was.',5000)}catch(e){toast('Nothing to undo.')}}
+function mergePopup(top){const o=V.pop,k=o.kind,keep=o.keep,drop=keep==o.a?o.b:o.a,K=dpItem(k,keep),D=dpItem(k,drop);
+if(!K||!D){V.pop=null;return''}
+const what=k=='gear'?'equipment':k=='crew'?'crew member':'contact',jd=dpJobs(k,drop),jdc=jd.filter(j=>!isUp(j)),pays=k=='crew'?PA(drop).length:0;
+const before=closedProfit();let after=before;const sn=JSON.stringify(S);doMerge(k,keep,drop);after=closedProfit();S=JSON.parse(sn);
+const chg=Math.abs(after-before)>0.004,ren=k=='contact'&&jdc.length&&K.name!=D.name,need=chg||ren;
+const card=(id,x)=>`<div class="card" style="margin:0;cursor:pointer;${keep==id?'border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)':''}" onclick="V.pop.keep=${id};V.pop.ack=false;render()"><div class="row"><b>${esc(x.name)}</b><span>${keep==id?'●':'○'}</span></div><div class="mu" style="margin-top:4px">${dpInfo(k,x)}</div><div class="mu">${dpJobs(k,id).length} job${dpJobs(k,id).length==1?'':'s'}${k=='crew'&&PA(id).length?' · '+PA(id).length+' payment'+(PA(id).length==1?'':'s'):''}</div></div>`;
+return top('Possible duplicate')+`<div class="mu" style="margin-bottom:8px">These two ${what}s look like the same one. Tap the one to <b>keep</b>.</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">${card(o.a,dpItem(k,o.a))}${card(o.b,dpItem(k,o.b))}</div>
+<div class="card" style="margin-bottom:10px"><b>What merging does</b><div class="mu" style="margin-top:4px">“${esc(D.name)}” is removed. ${jd.length?`It is replaced by “${esc(K.name)}” on ${jd.length} job${jd.length==1?'':'s'}${jdc.length?` (${jdc.length} completed)`:''}.`:'No jobs use it.'}${pays?` Its ${pays} payment${pays==1?'':'s'} move${pays==1?'s':''} to “${esc(K.name)}”.`:''} “${esc(K.name)}”'s details are kept${k=='contact'?'; missing phone, email and notes are filled from the other':''}.</div>
+${jdc.length?(chg?`<div style="margin-top:8px;color:var(--bad)"><b>Completed-job profit changes: ${m(before)} → ${m(after)}</b> (${after-before>0?'+':''}${m(after-before)}). Your statistics will change.</div>`:ren?`<div style="margin-top:8px;color:var(--bad)"><b>${jdc.length} completed job${jdc.length==1?'':'s'} will show the name “${esc(K.name)}”</b> instead of “${esc(D.name)}”. Per-client statistics will combine them.</div>`:`<div class="mu" style="margin-top:8px">Completed-job profit stays at ${m(before)}, so statistics are unaffected.</div>`):''}
+${need?`<label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:14px"><input type="checkbox" style="width:auto" ${o.ack?'checked':''} onchange="V.pop.ack=this.checked;render()">I understand this changes completed jobs</label>`:''}
+<div class="mu" style="margin-top:8px">A safety copy is saved first. You can undo from Menu.</div></div>
+<button class="${need?'dng':'p'}" style="width:100%;margin-bottom:6px" ${need&&!o.ack?'disabled':''} onclick="mergeGo()">Merge into “${esc(K.name)}”</button>
+<div style="display:flex;gap:6px"><button style="flex:1" onclick="mergeIgnore()">Not the same</button><button style="flex:1" onclick="V.pop={k:'bk'};render()">Back up first</button><button style="flex:1" onclick="V.pop=null;render()">Cancel</button></div></div>`}
+function toggleFi(){V.fi=!V.fi;clearTimeout(toggleFi.h);if(V.fi)toggleFi.h=setTimeout(()=>{V.fi=false;if(V.tab=='profit')render()},120000);render()}
+function profitView(){
+const done=S.jobs.filter(j=>!isUp(j)),up=S.jobs.filter(j=>isUp(j)&&!j.friend),yrs=[...new Set(done.map(j=>j.date.slice(0,4)))].sort().reverse();
+if(V.yr!='all'&&!yrs.includes(V.yr))V.yr='all';
+const inP=j=>V.yr=='all'||j.date.slice(0,4)==V.yr,D=done.filter(j=>(V.fi||!j.friend)&&inP(j)),Fr=done.filter(j=>j.friend&&inP(j));
+const sum=(a,f)=>a.reduce((x,j)=>x+f(j),0),cs=D.map(j=>[j,calc(j)]);
+const rev=sum(cs,x=>x[1].rev),cost=sum(cs,x=>x[1].cost),pr=rev-cost,mg=rev?pr/rev*100:0;
+const bars=(rows,key,lab)=>{const mx=Math.max(1,...rows.map(r=>Math.abs(r[key])));return rows.map(r=>`<div style="margin-bottom:10px"><div class="row"><span>${lab(r)}</span><b style="color:${r[key]<0?'var(--bad)':'inherit'}">${m(r[key])}</b></div><div style="height:6px;border-radius:3px;background:var(--ln);margin-top:4px"><div style="height:6px;border-radius:3px;background:${r[key]<0?'var(--bad)':'var(--ac)'};width:${Math.round(Math.abs(r[key])/mx*100)}%"></div></div></div>`).join('')};
+const grp=(kf,nf)=>{const o={};cs.forEach(([j,c])=>{const k=kf(j),r=o[k]=o[k]||{k,n:nf?nf(j):k,jobs:0,rev:0,cost:0,p:0,hrs:0};r.jobs++;r.rev+=c.rev;r.cost+=c.cost;r.p+=c.p;r.hrs+=c.hrs});return Object.values(o)};
+const sub=r=>`<div class="mu">${r.jobs} job${r.jobs==1?'':'s'} · ${m(r.rev)} revenue · ${r.rev?Math.round(r.p/r.rev*100):0}% margin</div>`;
+const stat=(l,v,s)=>`<div class="card" style="margin:0"><div class="mu">${l}</div><div style="font-size:18px;font-weight:600">${v}</div>${s?`<div class="mu" style="font-size:12px">${s}</div>`:''}</div>`;
+const none='<div class="mu">Nothing completed in this period yet.</div>';
+let body='';
+if(V.st=='over'){
+const best=[...cs].sort((a,b)=>b[1].p-a[1].p)[0],worst=[...cs].sort((a,b)=>a[1].pc-b[1].pc)[0],hrs=sum(cs,x=>x[1].hrs),oc=sum(cs,x=>x[1].oc),cc=sum(cs,x=>x[1].cc);
+body=`<div class="card"><div class="mu">Total profit</div><div class="big">${m(pr)}</div><div class="mu">on ${m(rev)} revenue · ${Math.round(mg)}% margin</div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">${stat('Jobs completed',D.length)}${stat('Avg profit / job',m(D.length?pr/D.length:0))}${stat('Crew pay',m(cc),hrs?'for '+hrs+' h':'')}${stat('Outsourced gear',m(oc))}${stat('Profit / crew hour',hrs?m(pr/hrs):'–','after crew pay')}${stat('Upcoming',up.length,m(sum(up,j=>calc(j).rev))+' quoted')}</div>`
++(best?`<div class="card"><div class="mu">Most profitable</div><div class="row"><b>${esc(jt(best[0]))}</b><span>${m(best[1].p)}</span></div><div class="mu" style="margin-top:8px">Lowest margin</div><div class="row"><b>${esc(jt(worst[0]))}</b><span>${Math.round(worst[1].pc)}%</span></div></div>`:none)
++`<div class="mu">Verdict: 40%+ worth it, 25–40% marginal, below 25% underpriced (placeholder thresholds).</div>`}
+else if(V.st=='month'){const r=grp(j=>j.date.slice(0,7)).sort((a,b)=>a.k<b.k?1:-1),mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+body=r.length?`<div class="card">${bars(r,'p',x=>mn[+x.k.slice(5)-1]+' '+x.k.slice(0,4)+sub(x))}</div>`:none}
+else if(V.st=='client'){const r=grp(j=>j.client).sort((a,b)=>b.p-a.p);body=r.length?`<div class="card">${bars(r,'p',x=>esc(x.n)+sub(x))}</div>`:none}
+else if(V.st=='cat'){const r=grp(j=>cn(j)).sort((a,b)=>b.p-a.p);body=r.length?`<div class="card">${bars(r,'p',x=>esc(x.n)+sub(x)+`<div class="mu">avg ${m(x.p/x.jobs)} profit / job</div>`)}</div>`:none}
+else if(V.st=='gear'){const o={};D.forEach(j=>j.lines.forEach(l=>{const g=G(l.g),r=o[l.g]=o[l.g]||{n:g.name,jobs:0,units:0,rev:0,oc:0};r.jobs++;r.units+=l.q;r.rev+=lr(l)*l.q;if(isOut(l))r.oc+=unitCost(l)*l.q}));
+const r=Object.values(o).sort((a,b)=>b.rev-a.rev);body=r.length?`<div class="card">${bars(r,'rev',x=>esc(x.n)+`<div class="mu">${x.jobs} job${x.jobs==1?'':'s'} · ${x.units} unit${x.units==1?'':'s'} hired out${x.oc?' · '+m(x.oc)+' supplier cost':''}</div>`)}</div><div class="mu">Amounts are equipment at list rates, not profit.</div>`:none}
+else if(V.st=='crew'){const o={};D.forEach(j=>(j.tasks||[]).forEach(t=>t.assign.forEach(a=>{const r=o[a.c]=o[a.c]||{n:C(a.c).name,jobs:new Set(),h:0,pay:0};r.jobs.add(j.id);if(a.role!='fix')r.h+=a.h;r.pay+=payOf(a)})));
+const r=Object.values(o).map(x=>({...x,jobs:x.jobs.size})).sort((a,b)=>b.pay-a.pay);body=r.length?`<div class="card">${bars(r,'pay',x=>esc(x.n)+`<div class="mu">${x.jobs} job${x.jobs==1?'':'s'} · ${x.h} h</div>`)}</div>`:none}
+else{const head='<tr><th>Job</th><th>Revenue</th><th>Costs</th><th>Profit</th><th>%</th></tr>';
+body=cs.length?`<div class="card scroll"><table>${head}${cs.map(([j,c])=>`<tr onclick="go('jobs',${j.id})"><td>${esc(jt(j))}</td><td>${m(c.rev)}</td><td>${m(c.cost)}</td><td>${m(c.p)}</td><td class="${c.v[1]}" style="color:inherit"><b>${Math.round(c.pc)}%</b></td></tr>`).join('')}</table></div>`:none}
+let F={rev:0,p:0};const frows=Fr.map(j=>{const c=calc(j);F.rev+=c.rev;F.p+=c.p;return`<tr onclick="go('jobs',${j.id})"><td>${esc(jt(j))}</td><td>${m(c.rev)}</td><td>${m(c.cost)}</td><td>${m(c.p)}</td><td><b>${Math.round(c.pc)}%</b></td></tr>`}).join('');
+const fr=S.jobs.some(j=>j.friend);
+const fsec=fr?`<div style="text-align:center;margin-top:32px"><button style="font-size:12px;opacity:.4;border:0;background:none;color:var(--tx)" onclick="V.pf=!V.pf;render()">Friendly ${V.pf?'⌃':'›'}</button><button style="font-size:12px;opacity:${V.fi?.8:.4};border:0;background:none;color:var(--tx)" onclick="toggleFi()">${V.fi?'Exclude friendly':'Include friendly'}</button></div>`+(V.pf?`<h2>Friendly jobs (${Fr.length})</h2><div class="card"><div class="mu">Result</div><div class="big">${m(F.p)}</div><div class="mu">on ${m(F.rev)} quoted · ${F.rev?Math.round(F.p/F.rev*100):0}% margin · kept separate from the totals above</div></div>${Fr.length?`<div class="card scroll"><table><tr><th>Job</th><th>Quote</th><th>Costs</th><th>Profit</th><th>%</th></tr>${frows}</table></div>`:''}`:''):'';
+return`<div class="row" style="margin-bottom:8px"><h1 style="margin:0">Stats</h1><select style="width:auto" onchange="V.yr=this.value;render()"><option value="all">All time</option>${yrs.map(y=>`<option ${V.yr==y?'selected':''}>${y}</option>`).join('')}</select></div>
+<div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;padding-bottom:2px">${STT.map(([k,l])=>`<button style="white-space:nowrap;${V.st==k?'background:var(--ac);color:var(--bg)':''}" onclick="V.st='${k}';render()">${l}</button>`).join('')}</div>${body}<div class="mu" style="margin:6px 0">${up.length?up.length+' upcoming job'+(up.length>1?'s':'')+' not counted until completed. ':''}${V.fi?'':'Friendly jobs are excluded.'}</div>${fsec}`}
+
+render();
+</script><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script>
+</body></html>
