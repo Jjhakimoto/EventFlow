@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Events">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#fafaf8">
+<meta name="theme-color" content="#EEF1F5">
 
 <style>
 :root{--bg:#fafaf8;--card:#fff;--tx:#1b1b1a;--mu:#76756f;--ln:#e6e5e0;--ac:#1b1b1a;--ok:#2f7d4f;--wa:#b7791f;--bad:#c0392b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -65,6 +65,32 @@ select.ph{color:var(--mu)}
 :root[data-theme="dark"]{--c-sound:#a78bfa;--c-light:#e07fc0;--c-visual:#4cc9b5}
 .tcard{border-left:4px solid var(--tc)}.chip.tc{color:var(--tc);border-color:var(--tc)}
 #wel{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px;cursor:pointer;opacity:1;transition:opacity .6s ease}#wel .wc{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:32px 28px 22px;width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.25)}#wel.off{opacity:0;pointer-events:none}#wel .wm{font-size:34px;font-weight:600;letter-spacing:-.02em}#wel .wg{color:var(--mu);font-size:15px}#wel .wl{width:36px;height:2px;background:var(--ac);border-radius:2px;margin:10px 0;animation:wl 3s ease-out forwards}@keyframes wl{from{width:0}to{width:80px}}#wel .wh{margin-top:14px;color:var(--mu);font-size:12px}
+
+/* ---- redesign: cool light ground, navy ink, one blue accent, floating tab bar ---- */
+@font-face{font-family:'Space Grotesk';src:url(vendor/space-grotesk.woff2) format('woff2');font-weight:300 700;font-display:swap}
+:root{--bg:#EEF1F5;--card:#fff;--tx:#14213D;--mu:#525C6B;--ln:#E3E7EE;--ac:#14213D;--ok:#1B6B3C;--wa:#8A4B00;--bad:#B42318;--pri:#2F5BEA;--sh:0 6px 24px rgba(20,33,61,.12);--hf:'Space Grotesk',system-ui,-apple-system,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1522;--card:#182033;--tx:#EAEEF6;--mu:#A3ADBF;--ln:#2A3550;--ac:#EAEEF6;--ok:#6FD39A;--wa:#F0B45A;--bad:#FF8A7A;--pri:#3F66F0;--sh:0 6px 24px rgba(0,0,0,.45)}}
+:root[data-theme="dark"]{--bg:#0F1522;--card:#182033;--tx:#EAEEF6;--mu:#A3ADBF;--ln:#2A3550;--ac:#EAEEF6;--ok:#6FD39A;--wa:#F0B45A;--bad:#FF8A7A;--pri:#3F66F0;--sh:0 6px 24px rgba(0,0,0,.45)}
+body{padding-bottom:150px}
+h1{font-family:var(--hf);font-size:28px;font-weight:700;letter-spacing:-.02em}
+h2{font-size:12px;letter-spacing:.06em}
+.big,#wel .wm{font-family:var(--hf);font-weight:700}
+.card{border:0;border-radius:18px;padding:14px 16px}.sw{border-radius:18px}.mgrp{padding:0}
+.chip{border:0;background:var(--bg);font-weight:600;padding:3px 9px}
+.chip.ok{background:color-mix(in srgb,var(--ok) 14%,var(--card))}.chip.wa{background:color-mix(in srgb,var(--wa) 14%,var(--card))}.chip.bad{background:color-mix(in srgb,var(--bad) 12%,var(--card))}
+input,select,textarea{border-radius:12px}
+button{border-radius:12px;font-weight:500}
+button.p{background:var(--pri);border-color:var(--pri);color:#fff}
+.sheet{border:0;border-radius:22px}.dlg{border:0;border-radius:18px}
+.tcard{border-left:0}.tcard>.row>span:first-child::before{content:'';display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--tc);margin-right:8px}
+.mrow .md{display:inline-block;width:8px;height:8px;border-radius:4px;margin-right:12px;vertical-align:1px}
+nav{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));max-width:616px;margin:0 auto;border:0;border-radius:22px;box-shadow:var(--sh);padding-bottom:0;z-index:3}
+nav button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 2px 8px;font-weight:600;position:relative}
+nav button svg{width:22px;height:22px}
+nav button.on::after{content:'';position:absolute;top:7px;left:calc(50% + 9px);width:7px;height:7px;border-radius:4px;background:var(--pri)}
+.fab{bottom:calc(88px + env(safe-area-inset-bottom,0px));background:var(--pri);color:#fff}.fm{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+.hero{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0 4px}.hero>div{border-radius:18px;padding:14px 16px;cursor:pointer;background:var(--card)}.hero .l{font-size:12px;font-weight:500;color:var(--mu)}.hero .v{font-family:var(--hf);font-size:22px;font-weight:700;margin-top:2px}.hero .s{font-size:12px;color:var(--mu);margin-top:2px}
+.hero>div.k{background:#14213D;color:#fff}.hero>div.k .l,.hero>div.k .s{color:#C3CBDA}
 </style></head><body><div id="wel" onclick="welHide()"><div class="wc"><div class="wm">EventFlow</div><div class="wl"></div><div class="wg" id="welg"></div><div class="wh">Tap to continue</div></div></div><main id="app"></main><script>(function(){var K="evtlast",W=5*60000,e=document.getElementById("wel"),t;
 function now(){return Date.now()}function last(){try{return +localStorage.getItem(K)||0}catch(x){return 0}}function stamp(){try{localStorage.setItem(K,now())}catch(x){}}
 function greet(){var h=new Date().getHours();document.getElementById("welg").textContent=(h<12?"Good morning":h<18?"Good afternoon":"Good evening")+" \u2014 let's get your jobs sorted"}
@@ -139,7 +165,7 @@ const l=S.taskTypes.slice().sort((a,b)=>a.name.localeCompare(b.name));
 return`<h1>Task list</h1><div class="mu" style="margin-bottom:10px">Tasks you usually have on jobs. Pick them from the dropdown when adding a task to a job.</div>`+dupBanner('tt')+(l.map(x=>`<div class="sw"><div class="swa"><button onclick="dupItem('taskTypes',${x.id})">Duplicate</button><button class="d" onclick="askDel('tt',${x.id})">Delete</button></div><div class="card" onclick="swTapE('ttview',${x.id})"><div class="row"><b>${esc(x.name)}</b></div><div class="row" style="margin-top:2px"><span class="mu">${use(x.name)} use${use(x.name)==1?'':'s'} in jobs${x.price?' · default '+m(x.price):''}</span></div></div></div>`).join('')||'<div class="mu">No task types yet.</div>')+(V.pop?'':`<button class="fab" aria-label="Add task type" onclick="V.pop={k:'ttnew'};render()">+</button>`)}
 function render(){if(!S.taskTypes)seedTT();
 const T=[['home','Home'],['jobs','Jobs'],['avail','Calendar'],['menu','Menu']],inMenu=['menu','gear','crew','pay','venues','tasks','contacts','profit','biz'];
-nav.innerHTML=T.map(([k,l])=>`<button class="${V.tab==k||(k=='menu'&&inMenu.includes(V.tab))?'on':''}" onclick="go('${k}')">${l}</button>`).join('');
+nav.innerHTML=T.map(([k,l])=>`<button class="${V.tab==k||(k=='menu'&&inMenu.includes(V.tab))?'on':''}" onclick="go('${k}')">${NI[k]||''}${l}</button>`).join('');
 app.innerHTML=({biz:bizView,venues:venuesView,tasks:tasksView,home:homeView,pay:payView,jobs:V.job?jobView:jobsView,avail:availView,gear:gearView,crew:crewView,menu:menuView,contacts:contactsView,profit:profitView})[V.tab]()+popup()+delDlg();app.querySelectorAll('input[type=number]').forEach(i=>{if(!i.getAttribute('step')){i.step='any';i.inputMode='decimal'}});save()}
 const today=()=>{const n=new Date();return n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())};
 const isUp=j=>j.date>=today()||j.status=='Meeting';
@@ -785,12 +811,13 @@ const dy=done.filter(j=>j.date.slice(0,4)==yr),dm=done.filter(j=>j.date.slice(0,
 const tile=(l,v,sub,go)=>`<div class="card" style="margin:0;padding:10px;${go?'cursor:pointer':''}" ${go?`onclick="${go}"`:''}><div class="mu" style="font-size:11px">${l}</div><div style="font-weight:600;font-size:15px">${v}</div>${sub?`<div class="mu" style="font-size:11px">${sub}</div>`:''}</div>`;
 const ry=sr(dy),py=sm(dy);
 const tiles=[tile('Profit · this month',m(sm(dm)),dm.length+' job'+(dm.length==1?'':'s'),"go('profit')"),tile('Profit · '+yr,m(py),ry?Math.round(py/ry*100)+'% margin':'',"go('profit')"),tile('Avg / job',m(dy.length?py/dy.length:0),dy.length+' done in '+yr,"go('profit')"),
-tile('Pipeline',m(sr(pipe)),pipe.length+' upcoming',"go('jobs')"),tile('To collect',m(ucol),unpaid.length+' invoice'+(unpaid.length==1?'':'s'),"go('jobs')"),tile('Owed to crew',m(owed),owedP?owedP+' person'+(owedP>1?'s':''):'settled',"go('pay')")].join('');
+tile('Pipeline',m(sr(pipe)),pipe.length+' upcoming',"go('jobs')")].join('');
+const hero=`<div class="hero"><div class="k" onclick="V.pop={k:'owed'};render()"><div class="l">Owed to you</div><div class="v">${m(ucol)}</div><div class="s">${unpaid.length} invoice${unpaid.length==1?'':'s'}${od.length?' · '+od.length+' overdue':''}</div></div><div onclick="go('pay')"><div class="l">You owe crew</div><div class="v">${m(owed)}</div><div class="s">${owedP?owedP+' person'+(owedP>1?'s':''):'settled'}</div></div></div>`;
 const dn=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-return`<div class="mu" style="margin-bottom:2px">${dn}</div><h1 style="margin-top:0">Home</h1>
-<div class="row"><h2 style="margin:0">This week</h2><span class="mu">${n} item${n==1?'':'s'}</span></div>${wk}
+return`<div class="row" style="align-items:flex-end"><span><div class="mu" style="margin-bottom:2px">${dn}</div><h1 style="margin:0">Home</h1></span><button class="p" style="border-radius:22px;padding:11px 16px;font-weight:600" onclick="newJob()">+ New job</button></div>${hero}
 <h2 style="margin-top:20px">Needs attention</h2>${A.length?A.map(arow).join(''):'<div class="card"><div class="mu">All clear. Nothing needs your attention.</div></div>'}
-<h2 style="margin-top:20px">At a glance</h2><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">${tiles}</div><div class="mu" style="margin:8px 0">Friendly jobs are not included.</div>`}
+<div class="row" style="margin-top:20px"><h2 style="margin:0">This week</h2><span class="mu">${n} item${n==1?'':'s'}</span></div>${wk}
+<h2 style="margin-top:20px">At a glance</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${tiles}</div><div class="mu" style="margin:8px 0">Friendly jobs are not included.</div>`}
 function payView(){return`<h1>Payments</h1>`+crewPayView()}
 function crewView(){const hd=`<h1>Crew</h1>`;return hd+sortBar('crew')+crewList()+
 fab()+(V.add?sheetTop('Add person')+`<div class="f"><div style="grid-column:1/-1"><label>Name</label><input id="pn"></div>
@@ -840,12 +867,12 @@ function menuView(){let owed=0;S.crew.forEach(c=>S.jobs.filter(j=>!isUp(j)).forE
 const g=ghCfg(),bk=!ghOk()?'Not set up':g.hold?'Paused':g.err&&Date.now()-(g.last||0)>864e5?'Failing':g.last?'On':'On',bkc=!ghOk()||g.hold||g.err&&Date.now()-(g.last||0)>864e5?'var(--wa)':'var(--ok)';
 let pm=null;try{pm=JSON.parse(localStorage.getItem('evtapp_premerge'))}catch(e){}
 const row=(act,l,v,col)=>`<div class="mrow" onclick="${act}"><span>${l}</span><span class="mu" style="${col?'color:'+col+';':''}">${v?v+' ':''}›</span></div>`;
-const sec=(t,rows)=>`<h2>${t}</h2><div class="card mgrp">${rows.join('')}</div>`;
+const sec=(t,rows,col)=>`<h2>${t}</h2><div class="card mgrp">${rows.map(r=>r.replace('<span>','<span><i class="md" style="background:'+(col||'var(--mu)')+'"></i>')).join('')}</div>`;
 return`<h1>Menu</h1>`+
-sec('People & places',[row("go('crew')",'Crew',S.crew.filter(x=>!x.arch).length),row("go('venues')",'Venues',(S.venues||[]).length),row("go('contacts')",'Clients & vendors',S.contacts.length)])+
-sec('Quotes & invoices',[row("go('biz')",'Business details',BZ().name?'':'Set up',BZ().name?'':'var(--wa)'),(()=>{const l=owedJobs(),t=l.reduce((a,j)=>a+jobTot(j),0),o=l.some(isOd);return row("V.pop={k:'owed'};render()",'Owed to you',l.length?m(t):'Nothing unpaid',o?'var(--bad)':'')})()])+
-sec('Money',[row("go('pay')",'Payments',owed>0.004?'You owe '+m(owed):'All settled',owed>0.004?'var(--wa)':''),row("go('profit')",'Stats','')])+
-sec('Library',[row("go('gear')",'Gear',S.gear.filter(x=>!x.arch).length),row("go('tasks')",'Task list',(S.taskTypes||[]).length+' types')])+
+sec('People & places',[row("go('crew')",'Crew',S.crew.filter(x=>!x.arch).length),row("go('venues')",'Venues',(S.venues||[]).length),row("go('contacts')",'Clients & vendors',S.contacts.length)],'var(--cr)')+
+sec('Quotes & invoices',[row("go('biz')",'Business details',BZ().name?'':'Set up',BZ().name?'':'var(--wa)'),(()=>{const l=owedJobs(),t=l.reduce((a,j)=>a+jobTot(j),0),o=l.some(isOd);return row("V.pop={k:'owed'};render()",'Owed to you',l.length?m(t):'Nothing unpaid',o?'var(--bad)':'')})()],'var(--pri)')+
+sec('Money',[row("go('pay')",'Payments',owed>0.004?'You owe '+m(owed):'All settled',owed>0.004?'var(--wa)':''),row("go('profit')",'Stats','')],'var(--ok)')+
+sec('Library',[row("go('gear')",'Gear',S.gear.filter(x=>!x.arch).length),row("go('tasks')",'Task list',(S.taskTypes||[]).length+' types')],'var(--c-sound)')+
 sec('Your data',[row("V.pop={k:'bk'};render()",'Backup &amp; restore',bk,bkc)].concat(pm?[row("V.pop={k:'undomerge'};render()",'Undo last merge',new Date(pm.t).toLocaleDateString('en-GB',{day:'numeric',month:'short'}))]:[]))}
 // ---- duplicate detection & safe merge ----
 const dpKey=(k,a,b)=>k+':'+Math.min(a,b)+'-'+Math.max(a,b);
@@ -943,6 +970,7 @@ return`<div class="row" style="margin-bottom:8px"><h1 style="margin:0">Stats</h1
 
 // ==== Quotes & invoices: business details, PDF creation, sending, getting paid ====
 // Everything here only ADDS fields (S.biz, S.issued, contact.addr/.vat, job.due/.pDate, docs[kind].gen/.due/.sent).
+const NI=(p=>({home:p('<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/>'),jobs:p('<rect x="4" y="7" width="16" height="12" rx="2"/><path d="M9 7V5h6v2"/>'),avail:p('<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>'),menu:p('<path d="M5 7h14M5 12h14M5 17h14"/>')}))(d=>'<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>');
 const BZ=()=>S.biz||(S.biz={}),ISS=()=>S.issued||(S.issued=[]);
 const r2=n=>Math.round((+n+Number.EPSILON)*100)/100;
 const addDays=(d,n)=>{const x=new Date(d+'T12:00:00');x.setDate(x.getDate()+n);return ld(x)};
