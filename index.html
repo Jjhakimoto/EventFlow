@@ -21,7 +21,7 @@ h1{font-size:20px;margin:4px 0 14px;font-weight:600}h2{font-size:13px;text-trans
 .card{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:12px;margin-bottom:8px}
 .row{display:flex;justify-content:space-between;align-items:center;gap:8px}.mu{color:var(--mu);font-size:13px}
 .sw{position:relative;overflow:hidden;border-radius:12px;margin-bottom:8px}.sw .card{margin:0;position:relative;transition:transform .2s;touch-action:pan-y;user-select:none;-webkit-user-select:none}.swa{visibility:hidden;position:absolute;right:0;top:0;bottom:0;display:flex}.sw.on .swa{visibility:visible}.swa button{width:80px;border:0;border-radius:0;font-size:13px;background:var(--ln);color:var(--tx)}.swa button.d{background:var(--bad);color:#fff}
-.sheet.big{width:min(760px,94vw);max-width:none;padding:12px}.dvf{display:block;width:100%;height:60vh;border:0;border-radius:8px;background:#fff}.dvs{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;margin:8px 0;font-size:13px}.dvs b{font-weight:600}.dvb{display:flex;gap:8px}.dvb button{flex:1;padding:7px 4px;font-size:13px;white-space:nowrap}.dvb a{color:inherit}.sheet.wide{left:auto;right:24px;transform:translateY(-50%);width:480px}
+.sheet.big{width:min(760px,94vw);max-width:none;padding:12px}.dvf{display:block;width:100%;height:60vh;border:0;border-radius:8px;background:#fff}.dvs{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;margin:8px 0;font-size:13px}.dvs b{font-weight:600}.dvb{display:flex;gap:8px;flex-wrap:wrap}.dvb button{flex:1;padding:7px 4px;font-size:13px;white-space:nowrap}.dvb a{color:inherit}.sheet.wide{left:auto;right:24px;transform:translateY(-50%);width:480px}
 .pdfp{position:fixed;left:24px;top:24px;bottom:24px;right:540px;z-index:6;background:var(--card);border:1px solid var(--ln);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
 .pdfo{position:fixed;left:12px;right:12px;top:12px;bottom:12px;z-index:7;background:var(--card);border:1px solid var(--ln);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
 .pdfp iframe,.pdfo iframe{flex:1;border:0;width:100%;background:#fff}
@@ -138,9 +138,9 @@ function tasksView(){const use=n=>ttJobs(n).reduce((a,j)=>a+j.tasks.filter(t=>St
 const l=S.taskTypes.slice().sort((a,b)=>a.name.localeCompare(b.name));
 return`<h1>Task list</h1><div class="mu" style="margin-bottom:10px">Tasks you usually have on jobs. Pick them from the dropdown when adding a task to a job.</div>`+dupBanner('tt')+(l.map(x=>`<div class="sw"><div class="swa"><button onclick="dupItem('taskTypes',${x.id})">Duplicate</button><button class="d" onclick="askDel('tt',${x.id})">Delete</button></div><div class="card" onclick="swTapE('ttview',${x.id})"><div class="row"><b>${esc(x.name)}</b></div><div class="row" style="margin-top:2px"><span class="mu">${use(x.name)} use${use(x.name)==1?'':'s'} in jobs${x.price?' · default '+m(x.price):''}</span></div></div></div>`).join('')||'<div class="mu">No task types yet.</div>')+(V.pop?'':`<button class="fab" aria-label="Add task type" onclick="V.pop={k:'ttnew'};render()">+</button>`)}
 function render(){if(!S.taskTypes)seedTT();
-const T=[['home','Home'],['jobs','Jobs'],['avail','Calendar'],['menu','Menu']],inMenu=['menu','gear','crew','pay','venues','tasks','contacts','profit'];
+const T=[['home','Home'],['jobs','Jobs'],['avail','Calendar'],['menu','Menu']],inMenu=['menu','gear','crew','pay','venues','tasks','contacts','profit','biz'];
 nav.innerHTML=T.map(([k,l])=>`<button class="${V.tab==k||(k=='menu'&&inMenu.includes(V.tab))?'on':''}" onclick="go('${k}')">${l}</button>`).join('');
-app.innerHTML=({venues:venuesView,tasks:tasksView,home:homeView,pay:payView,jobs:V.job?jobView:jobsView,avail:availView,gear:gearView,crew:crewView,menu:menuView,contacts:contactsView,profit:profitView})[V.tab]()+popup()+delDlg();app.querySelectorAll('input[type=number]').forEach(i=>{if(!i.getAttribute('step')){i.step='any';i.inputMode='decimal'}});save()}
+app.innerHTML=({biz:bizView,venues:venuesView,tasks:tasksView,home:homeView,pay:payView,jobs:V.job?jobView:jobsView,avail:availView,gear:gearView,crew:crewView,menu:menuView,contacts:contactsView,profit:profitView})[V.tab]()+popup()+delDlg();app.querySelectorAll('input[type=number]').forEach(i=>{if(!i.getAttribute('step')){i.step='any';i.inputMode='decimal'}});save()}
 const today=()=>{const n=new Date();return n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())};
 const isUp=j=>j.date>=today()||j.status=='Meeting';
 function jobOrder(){return[...S.jobs].sort((a,b)=>{const ua=isUp(a),ub=isUp(b);if(ua!=ub)return ua?-1:1;return ua?(a.date<b.date?-1:a.date>b.date?1:0):(a.date<b.date?1:a.date>b.date?-1:0)})}
@@ -167,7 +167,7 @@ function swTapE(k,id){if(SW.moved){SW.moved=false;return}if(SW.open){closeSw();r
 function dupItem(kind,id){const arr=S[kind],o=arr.find(x=>x.id==id),c=JSON.parse(JSON.stringify(o));c.id=nid(arr);c.name=o.name+' (copy)';arr.push(c);SW.open=null;V.pop={k:kind=='gear'?'gedit':kind=='taskTypes'?'ttedit':'cedit',id:c.id};render()}
 function swTap(id){if(SW.moved){SW.moved=false;return}if(SW.open){closeSw();return}go('jobs',id)}
 function closeSw(){if(SW.open){const p=SW.open.parentNode;SW.open.style.transform='';SW.open=null;setTimeout(()=>p.classList.remove('on'),220)}}
-function dupJob(id){const o=J(id),j=JSON.parse(JSON.stringify(o));j.id=nid(S.jobs);j.event=(o.event||o.client)+' (copy)';delete j.estNo;delete j.invNo;delete j.docs;delete j.pays;delete j.qDate;delete j.iDate;j.lines.forEach(l=>{delete l.ret});S.jobs.push(j);SW.open=null;go('jobs',j.id);V.pop={k:'jedit',id:j.id,isNew:true};render()}
+function dupJob(id){const o=J(id),j=JSON.parse(JSON.stringify(o));j.id=nid(S.jobs);j.event=(o.event||o.client)+' (copy)';delete j.estNo;delete j.invNo;delete j.docs;delete j.pays;delete j.qDate;delete j.iDate;delete j.due;delete j.pDate;j.lines.forEach(l=>{delete l.ret});S.jobs.push(j);SW.open=null;go('jobs',j.id);V.pop={k:'jedit',id:j.id,isNew:true};render()}
 function swStart(e,x,y){if(e.target.closest&&e.target.closest('.swa'))return;const c=e.target.closest&&e.target.closest('.sw .card');if(!c){closeSw();return}if(SW.open&&SW.open!==c)closeSw();SW.x=x;SW.y=y;SW.el=c;SW.dx=0;SW.dir='';SW.moved=false;c.style.transition='none'}
 function swMove(x,y){if(!SW.el)return;const dx=x-SW.x,dy=y-SW.y;if(!SW.dir&&(Math.abs(dx)>8||Math.abs(dy)>8))SW.dir=Math.abs(dx)>Math.abs(dy)?'h':'v';if(SW.dir!='h')return;SW.moved=true;SW.el.parentNode.classList.add('on');const base=SW.open===SW.el?-160:0;SW.dx=Math.max(-160,Math.min(0,base+dx));SW.el.style.transform='translateX('+SW.dx+'px)'}
 function swEnd(){const c=SW.el;if(!c)return;c.style.transition='';if(SW.dir=='h'){if(SW.dx<-60){c.style.transform='translateX(-160px)';SW.open=c}else{c.style.transform='';const p=c.parentNode;setTimeout(()=>p.classList.remove('on'),220);if(SW.open===c)SW.open=null}}SW.el=null;setTimeout(()=>{SW.moved=false},350)}
@@ -242,7 +242,7 @@ return`<button onclick="go('jobs')">← Jobs</button>
 <div class="card"><div class="mu">${j.event?esc(j.client)+' · ':''}${j.date}${j.time?' · '+j.time+(j.tEnd?'–'+j.tEnd:''):''} · ${cn(j)}</div>${j.sDate||j.sTime?`<div class="mu" style="margin-top:2px">Setup ${[j.sDate||j.date,j.sTime].filter(Boolean).join(' · ')}</div>`:''}${isUp(j)&&!j.friend?'<div class="mu" style="margin-top:2px">Upcoming · not counted in profit totals yet</div>':''}${j.loc?`<div style="margin-top:4px">📍 <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(j.loc)}" target="_blank" rel="noopener" style="color:inherit">${esc(j.loc)}</a>${(()=>{const v=venueFor(j.loc);return v?` · <a href="#" style="color:inherit" onclick="event.preventDefault();V.pop={k:'vview',id:${v.id}};render()">Venue contacts ›</a>`:''})()}</div>`:''}
 <div class="row" style="margin-top:6px"><span>${j.status}</span>${j.friend?'<span class="chip">Friendly</span>':''}</div>
 <div class="row" style="margin-top:6px;cursor:pointer" onclick="openDv(${j.id})"><span class="mu">${isBk(j)?'Income':'Quote'}${((j.docs||{})[isBk(j)?'invoice':'quote']||{}).pdf?' 📎':''} ›</span><b>${c.est?'≈ '+m(c.rev):m(j.quote)} <span class="mu" style="font-weight:400">${c.est?'estimate · equipment + tasks':j.friend?'':j.vat=='incl'?'incl. VAT':j.vat=='excl'?'excl. VAT ('+j.vatRate+'%)':'no VAT'}</span></b></div>${(()=>{const x=docDiff(j);return x&&x.d!==0?`<div style="text-align:right;font-size:12px;color:${ddCol(x)}" title="Invoice compared with quote">${x.d>0?'▲':'▼'} invoice ${ddTxt(x)}</div>`:''})()}</div>
-<h2>Documents</h2>${(isBk(j)?['invoice']:j.friend?['quote']:['quote','invoice']).map(k=>{const n=k=='quote'?j.estNo:j.invNo,d=(j.docs||{})[k];return`<div class="card" style="cursor:pointer" onclick="openDv(${j.id},'${k}')"><div class="row"><span><span class="mu">${k=='quote'?'Quote':'Invoice'}</span>${d&&d.pdf?' 📎':''} ${n?'<b>'+esc(n)+'</b>':'<span class="mu">no number</span>'}${d&&d.total!=null?' <span class="mu">· '+m(d.total)+'</span>':''}</span><button onclick="event.stopPropagation();pickDoc(${j.id},'${k}')">${d?'Replace':'Upload PDF'}</button></div></div>`}).join('')}${(()=>{const x=docDiff(j);return x?`<div class="mu" style="font-size:12px;margin:-2px 2px 4px">Quote (predicted) ${m(x.q)} → Invoice (actual) ${m(x.i)} excl. VAT · <span style="color:${ddCol(x)}">${ddTxt(x)}</span></div>`:''})()}<h2>Equipment</h2>${lines||'<div class="mu">None yet</div>'}
+<h2>Documents</h2>${(isBk(j)?['invoice']:j.friend?['quote']:['quote','invoice']).map(k=>{const n=k=='quote'?j.estNo:j.invNo,d=(j.docs||{})[k];return`<div class="card" style="cursor:pointer" onclick="openDv(${j.id},'${k}')"><div class="row"><span><span class="mu">${k=='quote'?'Quote':'Invoice'}</span>${d&&d.pdf?' 📎':''} ${n?'<b>'+esc(n)+'</b>':'<span class="mu">no number</span>'}${d&&d.total!=null?' <span class="mu">· '+m(d.total)+'</span>':''}</span><span style="white-space:nowrap"><button class="${d?'':'p'}" onclick="event.stopPropagation();mkOpen(${j.id},'${k}')">${d&&d.gen?'Update':'Create'}</button> <button onclick="event.stopPropagation();pickDoc(${j.id},'${k}')">${d?'Replace':'Upload'}</button></span></div></div>`}).join('')}${(()=>{const x=docDiff(j);return x?`<div class="mu" style="font-size:12px;margin:-2px 2px 4px">Quote (predicted) ${m(x.q)} → Invoice (actual) ${m(x.i)} excl. VAT · <span style="color:${ddCol(x)}">${ddTxt(x)}</span></div>`:''})()}<h2>Equipment</h2>${lines||'<div class="mu">None yet</div>'}
 <div class="f" style="grid-template-columns:1fr 64px auto;align-items:center"><div style="position:relative"><input type="hidden" id="lg"><input id="lgs" type="search" autocomplete="off" autocapitalize="off" placeholder="Add equipment… type to search" oninput="document.getElementById('lg').value='';lgFill()" onfocus="lgFill()" onblur="setTimeout(lgHide,150)" onkeydown="if(event.key=='Enter'){event.preventDefault();lgEnter()}"><div id="lgb" class="lgb" style="display:none"></div></div><input id="lq" type="number" value="1" min="1"><button class="p" aria-label="Add equipment" onclick="addLine(${j.id})">+</button></div>
 <h2>Tasks &amp; crew pay</h2>${tasksHtml}${(()=>{const ids=[...new Set(j.tasks.flatMap(t=>t.assign.map(a=>a.c)))];return ids.length?'<h2>Crew payments</h2>'+ids.map(id=>payRow(j,id,false)).join(''):''})()}
 <h2>Summary</h2><div class="card"><div class="sum"><span>${c.est?'Estimate (equipment + tasks)':'Quote as entered'}</span><b>${c.est?'≈ '+m(c.rev):m(j.quote)}</b>${j.friend?'':`<span>VAT (not income)</span><b>${m(c.vatAmt)}</b>`}<span>Revenue (ex VAT)</span><b>${m(c.rev)}</b><span class="mu">Equipment at list rates</span><b class="mu">${m(c.eq)}</b><span class="mu">Tasks at list prices</span><b class="mu">${m(tt)}</b>
@@ -324,6 +324,7 @@ else if(k=='line'){const l=J(a).lines[b];msg=`Remove ${l.q} × ${G(l.g).name} fr
 else{const x=J(a).tasks.find(t=>t.id==b).assign[c];msg=`Remove ${C(x.c).name} from this task?`}
 V.del={k,a,b,c,msg};render()}
 function confirmDel(){const d=V.del;V.del=null;
+if(d.k=='void'){docVoidDo(d.a);return}
 if(d.k=='venue')S.venues=S.venues.filter(x=>x.id!=d.a);
 else if(d.k=='tt')S.taskTypes=S.taskTypes.filter(x=>x.id!=d.a);
 else if(d.k=='gear')S.gear=S.gear.filter(x=>x.id!=d.a);
@@ -335,7 +336,7 @@ else if(d.k=='job'){idb().then(db=>{try{db.transaction('f','readwrite').objectSt
 else if(d.k=='line')J(d.a).lines.splice(d.b,1);
 else J(d.a).tasks.find(t=>t.id==d.b).assign.splice(d.c,1);
 render()}
-function delDlg(){return V.del?`<div class="bdd" onclick="V.del=null;render()"></div><div class="dlg" role="alertdialog"><b>Are you sure?</b><div class="mu" style="margin:6px 0 14px">${esc(V.del.msg)}<br>This can't be undone.</div><div class="row" style="justify-content:flex-end"><button onclick="V.del=null;render()">Cancel</button><button class="dng" onclick="confirmDel()">Delete</button></div></div>`:''}
+function delDlg(){return V.del?`<div class="bdd" onclick="V.del=null;render()"></div><div class="dlg" role="alertdialog"><b>Are you sure?</b><div class="mu" style="margin:6px 0 14px">${esc(V.del.msg)}<br>This can't be undone.</div><div class="row" style="justify-content:flex-end"><button onclick="V.del=null;render()">Cancel</button><button class="dng" onclick="confirmDel()">${V.del.btn||'Delete'}</button></div></div>`:''}
 function setLine(jid,i,f,v){const l=J(jid).lines[i];l[f]=f=='rate'?(v===''?undefined:Math.max(0,+v||0)):f=='q'?Math.max(1,Math.round(+v)||1):f=='ocost'?+v||0:v;save()}
 function lineForm(j,i){const l=j.lines[i],g=G(l.g);
 return`<datalist id="sups">${sups().map(x=>`<option value="${esc(x)}">`).join('')}</datalist><div class="mu">${esc(g.name)}${isOut(l)?' · outsourced':''} · default charge ${m(g.rate)}/day</div>${isOut(l)?`<div style="margin:8px 0">${chk(l.ret,`setLine(${j.id},${i},'ret',this.checked)`,'Returned to supplier')}</div>`:''}
@@ -417,7 +418,7 @@ const hasPdf=d&&d.pdf;
 return top((isBk(j)&&kd=='invoice'?'Income':lab)+(no?' '+esc(no):'')).replace('<div class="sheet">','<div class="sheet big">')+`<div class="mu" style="margin-bottom:8px">${esc(jt(j))}${j.event?' · '+esc(j.client):''}</div>
 ${hasPdf?`<div id="dvbox"><div class="mu" id="dvmsg">Loading PDF…</div></div>`:d?`<div class="mu" style="margin-bottom:8px">The PDF itself was not saved for this ${lab.toLowerCase()}. Upload it again to see it here.</div>`:`<div class="mu" style="margin-bottom:8px">No ${lab.toLowerCase()} document attached yet.</div>`}
 <div class="dvs"><span><span class="mu">${isBk(j)?'Income':'Quote'}</span> <b>${m(j.quote)}</b></span>${j.friend?'':`<span><span class="mu">Excl. VAT</span> <b>${m(c.rev)}</b></span><span><span class="mu">VAT</span> <b>${m(c.vatAmt)}</b></span><span><span class="mu">Incl.</span> <b>${m(tot)}</b></span>`}${d&&(d.date||d.file)?`<span class="mu">${d.date||''}${d.date&&d.file?' · ':''}${d.file?esc(d.file):''}</span>`:''}</div>
-${(()=>{const x=docDiff(j);return x?`<div class="mu" style="font-size:12px;margin:-2px 0 8px">Quote ${m(x.q)} → Invoice ${m(x.i)} excl. VAT · <span style="color:${ddCol(x)}">${ddTxt(x)}</span></div>`:''})()}<div class="dvb"><button onclick="V.pop=null;render();pickDoc(${j.id},'${kd}')">${d?'Replace':'Upload PDF'}</button><button onclick="V.pop={k:'jedit',id:${j.id}};render()">Edit value</button>${hasPdf?`<button id="dvlink" onclick="window.open(_dvu,'_blank')">Open ↗</button>`:''}</div></div>`}
+${(()=>{const x=docDiff(j);return x?`<div class="mu" style="font-size:12px;margin:-2px 0 8px">Quote ${m(x.q)} → Invoice ${m(x.i)} excl. VAT · <span style="color:${ddCol(x)}">${ddTxt(x)}</span></div>`:''})()}<div class="dvb"><button onclick="V.pop=null;render();pickDoc(${j.id},'${kd}')">${d?'Replace':'Upload PDF'}</button><button onclick="V.pop={k:'jedit',id:${j.id}};render()">Edit value</button>${hasPdf?`<button id="dvlink" onclick="window.open(_dvu,'_blank')">Open ↗</button>`:''}</div>${dvExtra(j,kd,d)}</div>`}
 if(V.pop.k=='doc'){const o=V.pop,html=top(docTitle())+docReview()+'</div>',wide=o.url&&innerWidth>=900;
 const frame=o.url?`<div class="${wide?'pdfp':'pdfo'}">${wide?'':'<div class="row" style="padding:8px 12px"><b>Uploaded PDF</b><button class="x" onclick="V.pop.pdf=false;render()">✕</button></div>'}<iframe src="${o.url}" title="Uploaded PDF"></iframe><div class="mu" style="padding:6px 12px"><a href="${o.url}" target="_blank" rel="noopener" style="color:inherit">Open the PDF in a new tab</a></div></div>`:'';
 return wide?frame+html.replace('<div class="sheet">','<div class="sheet wide">'):html+(o.pdf?frame:'')}
@@ -427,6 +428,8 @@ if(V.pop.k=='cnew')return top(V.pop.cl&&!V.pop.ve?'New client':V.pop.ve&&!V.pop.
 <div><label>Phone</label><input id="nph" type="tel"></div><div><label>Email</label><input id="nem" type="email"></div>
 <div style="grid-column:1/-1"><label>Notes</label><input id="nno"></div>
 <div style="grid-column:1/-1"><button class="p" style="width:100%" onclick="saveNewContact()">Save</button></div></div></div>`;
+if(V.pop.k=='mk')return top('Create '+V.pop.kind)+mkSheet();
+if(V.pop.k=='owed')return top('Owed to you')+owedSheet();
 if(V.pop.k=='bk')return top('Backup & restore')+`<div class="mu" style="margin-bottom:4px">Your data. Copy it and keep it somewhere safe.</div><textarea id="bko" readonly rows="4" style="font:inherit;font-size:12px;color:var(--tx);background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:8px;width:100%" onfocus="this.select()">${esc(JSON.stringify(S))}</textarea><div style="display:flex;gap:6px;margin:6px 0 14px"><button style="flex:1" onclick="bkCopy()">Copy</button><button style="flex:1" onclick="bkDownload()">Download file</button></div>${ghBlock()}<div class="mu" style="margin-bottom:4px">Restore: paste a backup here. This replaces what is in the app now.</div><textarea id="bki" rows="4" style="font:inherit;font-size:12px;color:var(--tx);background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:8px;width:100%" placeholder="Paste backup text"></textarea><div id="bkm" class="mu" style="color:var(--bad)"></div><button class="p" style="width:100%;margin-top:6px" onclick="bkRestore()">Restore</button></div>`;
 if(V.pop.k=='pay')return top('Payment · '+esc(C(V.pop.c).name))+payPop()+'</div>';
 if(V.pop.k=='paywho')return top('Who was paid?')+S.crew.map(c=>`<button style="width:100%;margin-bottom:6px;text-align:left" onclick="openPay(${c.id})">${esc(c.name)}</button>`).join('')+'</div>';
@@ -545,11 +548,11 @@ let _dvu;const docEx=d=>d?(d.sub!=null&&d.sub!==''?+d.sub:d.total!=null&&d.total
 function docDiff(j){if(j.friend||isBk(j))return null;const q=docEx((j.docs||{}).quote),i=docEx((j.docs||{}).invoice);if(q==null||i==null||isNaN(q)||isNaN(i))return null;const d=Math.round((i-q)*100)/100;return{q,i,d,pct:q?d/q*100:0}}
 const ddTxt=x=>x.d===0?'matches the quote':(x.d>0?'+':'−')+m(Math.abs(x.d))+(x.q?' ('+(x.d>0?'+':'−')+Math.abs(x.pct).toFixed(1)+'%)':'');
 const ddCol=x=>x.d===0?'var(--mu)':x.d>0?'var(--ok)':'var(--wa)';
-function openDv(jid,kind){V.pop={k:'dv',j:jid,kind};render();loadDv()}
+function openDv(jid,kind){_dvb=null;V.pop={k:'dv',j:jid,kind};render();loadDv()}
 async function loadDv(){const o=V.pop;if(!o||o.k!='dv')return;const j=J(o.j),kd=o.kind||(isBk(j)?'invoice':'quote'),d=(j.docs||{})[kd];if(!d||!d.pdf)return;
 try{const b=await idbGet(o.j+':'+kd);const box=document.getElementById('dvbox');if(!box||!V.pop||V.pop.k!='dv')return;
 if(!b){box.innerHTML='<div class="mu">The PDF is no longer stored in this browser. Upload it again.</div>';return}
-if(_dvu)URL.revokeObjectURL(_dvu);_dvu=URL.createObjectURL(b);box.innerHTML='<iframe id="dvf" class="dvf" title="Uploaded PDF" src="'+_dvu+'"></iframe>';
+_dvb=b;if(_dvu)URL.revokeObjectURL(_dvu);_dvu=URL.createObjectURL(b);box.innerHTML='<iframe id="dvf" class="dvf" title="Uploaded PDF" src="'+_dvu+'"></iframe>';
 }catch(e){const box=document.getElementById('dvbox');if(box)box.innerHTML='<div class="mu">Could not open the saved PDF.</div>'}}
 function pickDoc(jid,kind){DK={jid,kind};const f=document.getElementById('docf');f.value='';f.click()}
 async function readDoc(f){if(!f||!DK)return;const tgt=DK;toast('Reading '+f.name+'…',0);
@@ -752,8 +755,8 @@ const ovl=(a,b)=>{let a1=mins(a.time),a2=mins(a.tEnd),b1=mins(b.time),b2=mins(b.
 const dbl=[];soon.forEach(d=>{const by={};S.jobs.filter(j=>j.date==d&&counts(j)).forEach(j=>(j.tasks||[]).forEach(t=>t.assign.forEach(a=>{(by[a.c]=by[a.c]||new Map()).set(j.id,j)})));
 Object.entries(by).forEach(([c,mp])=>{const js=[...mp.values()];if(js.length<2)return;let sure=false,unk=false;for(let i=0;i<js.length;i++)for(let k=i+1;k<js.length;k++){const o=ovl(js[i],js[k]);if(o===true)sure=true;else if(o===null)unk=true}if(sure||unk)dbl.push({c,d,js,sure})})});
 if(dbl.length){const seen=new Map();dbl.forEach(x=>x.js.forEach(j=>seen.set(j.id,j)));A.push({k:'dbl',t:'Crew double-booked',s:dbl.slice(0,3).map(x=>esc(C(x.c).name)+' · '+dNice(x.d)+(x.sure?'':' (check times)')).join(', ')+(dbl.length>3?' +'+(dbl.length-3):''),jobs:[...seen.values()],c:dbl.some(x=>x.sure)?'bad':'wa'})}
-const od=real.filter(j=>j.status=='Invoiced'&&j.iDate&&ds(j.iDate)>30).sort((a,b)=>a.iDate<b.iDate?-1:1);
-if(od.length)A.push({k:'od',t:'Overdue invoices (30+ days)',s:od.length+' · '+m(tot(od))+' · oldest '+ds(od[0].iDate)+' days',jobs:od,sub:j=>ds(j.iDate)+' days since invoice · '+m(calc(j).rev+calc(j).vatAmt),c:'bad'});
+const od=real.filter(isOd).sort((a,b)=>odDays(b)-odDays(a));
+if(od.length)A.push({k:'od',t:'Overdue invoices',s:od.length+' · '+m(tot(od))+' · oldest '+odDays(od[0])+' day'+(odDays(od[0])==1?'':'s')+' overdue',jobs:od,sub:j=>odDays(j)+' day'+(odDays(j)==1?'':'s')+' overdue · '+m(calc(j).rev+calc(j).vatAmt),c:'bad'});
 const fu=real.filter(j=>j.status=='Quoted'&&isUp(j)&&j.qDate&&ds(j.qDate)>7).sort((a,b)=>a.qDate<b.qDate?-1:1);
 if(fu.length)A.push({k:'fu',t:'Quotes to follow up',s:fu.length+' sent over a week ago · '+m(fu.reduce((x,j)=>x+calc(j).rev,0))+' excl. VAT',jobs:fu,sub:j=>'quoted '+ds(j.qDate)+' days ago',c:'wa'});
 const nocrew=S.jobs.filter(j=>soon.includes(j.date)&&!isBk(j)&&!(j.tasks||[]).some(t=>t.assign.length));
@@ -767,7 +770,7 @@ const toInv=real.filter(j=>!isUp(j)&&j.status=='Delivered');
 if(toInv.length)A.push({k:'toinv',t:'Delivered, not invoiced',s:toInv.length+' job'+(toInv.length>1?'s':'')+' · '+m(tot(toInv))+' incl. VAT',jobs:toInv,c:'wa'});
 const unpaid=real.filter(j=>j.status=='Invoiced'),pend=unpaid.filter(j=>!od.includes(j));
 const ucol=tot(unpaid);
-if(pend.length)A.push({k:'unpaid',t:'Waiting to be paid',s:pend.length+' invoice'+(pend.length>1?'s':'')+' · '+m(tot(pend)),jobs:pend.sort((a,b)=>a.date<b.date?-1:1),sub:j=>j.iDate?ds(j.iDate)+' days since invoice':'',c:'wa'});
+if(pend.length)A.push({k:'unpaid',t:'Waiting to be paid',s:pend.length+' invoice'+(pend.length>1?'s':'')+' · '+m(tot(pend)),jobs:pend.sort((a,b)=>a.date<b.date?-1:1),sub:j=>j.due?'due '+dNice(j.due):j.iDate?ds(j.iDate)+' days since invoice':'',c:'wa'});
 let owed=0,owedP=0;S.crew.forEach(c=>{let o=0;S.jobs.filter(j=>!isUp(j)).forEach(j=>{o+=Math.max(0,owedBy(j,c.id)-paidBy(j,c.id))});if(o>0.004){owed+=o;owedP++}});
 if(owed>0.004)A.push({k:'owed',t:'You owe crew',s:m(owed)+' · '+owedP+' person'+(owedP>1?'s':''),c:'wa',go:"go('pay')"});
 const qd=real.filter(j=>j.status=='Quoted'&&isUp(j)&&!fu.includes(j));
@@ -818,6 +821,8 @@ function contactForm(c){return`<div class="f"><div style="grid-column:1/-1"><lab
 ${chk(c.isCl,`updq('contacts',${c.id},'isCl',this.checked)`,'Client')}${chk(c.isVe,`updq('contacts',${c.id},'isVe',this.checked)`,'Vendor')}
 <div><label>Phone</label><input type="tel" value="${esc(c.phone||'')}" onchange="updq('contacts',${c.id},'phone',this.value)"></div>
 <div><label>Email</label><input type="email" value="${esc(c.email||'')}" onchange="updq('contacts',${c.id},'email',this.value)"></div>
+<div style="grid-column:1/-1"><label>Address (shown on quotes and invoices)</label><textarea rows="3" style="${TA}" onchange="updq('contacts',${c.id},'addr',this.value.trim())">${esc(c.addr||'')}</textarea></div>
+<div style="grid-column:1/-1"><label>VAT number</label><input value="${esc(c.vat||'')}" onchange="updq('contacts',${c.id},'vat',this.value.trim())"></div>
 <div style="grid-column:1/-1"><label>Notes</label><input value="${esc(c.notes||'')}" onchange="updq('contacts',${c.id},'notes',this.value)"></div></div>`}
 function contactsView(){const f=V.cf||'all';
 const tabs=[['all','All'],['client','Clients'],['vendor','Vendors']].map(([k,l])=>`<button class="${f==k?'p':''}" style="padding:4px 14px;font-size:13px" onclick="V.cf='${k}';render()">${l}</button>`).join('');
@@ -838,6 +843,7 @@ const row=(act,l,v,col)=>`<div class="mrow" onclick="${act}"><span>${l}</span><s
 const sec=(t,rows)=>`<h2>${t}</h2><div class="card mgrp">${rows.join('')}</div>`;
 return`<h1>Menu</h1>`+
 sec('People & places',[row("go('crew')",'Crew',S.crew.filter(x=>!x.arch).length),row("go('venues')",'Venues',(S.venues||[]).length),row("go('contacts')",'Clients & vendors',S.contacts.length)])+
+sec('Quotes & invoices',[row("go('biz')",'Business details',BZ().name?'':'Set up',BZ().name?'':'var(--wa)'),(()=>{const l=owedJobs(),t=l.reduce((a,j)=>a+jobTot(j),0),o=l.some(isOd);return row("V.pop={k:'owed'};render()",'Owed to you',l.length?m(t):'Nothing unpaid',o?'var(--bad)':'')})()])+
 sec('Money',[row("go('pay')",'Payments',owed>0.004?'You owe '+m(owed):'All settled',owed>0.004?'var(--wa)':''),row("go('profit')",'Stats','')])+
 sec('Library',[row("go('gear')",'Gear',S.gear.filter(x=>!x.arch).length),row("go('tasks')",'Task list',(S.taskTypes||[]).length+' types')])+
 sec('Your data',[row("V.pop={k:'bk'};render()",'Backup &amp; restore',bk,bkc)].concat(pm?[row("V.pop={k:'undomerge'};render()",'Undo last merge',new Date(pm.t).toLocaleDateString('en-GB',{day:'numeric',month:'short'}))]:[]))}
@@ -934,6 +940,163 @@ const fr=S.jobs.some(j=>j.friend);
 const fsec=fr?`<div style="text-align:center;margin-top:32px"><button style="font-size:12px;opacity:.4;border:0;background:none;color:var(--tx)" onclick="V.pf=!V.pf;render()">Friendly ${V.pf?'⌃':'›'}</button><button style="font-size:12px;opacity:${V.fi?.8:.4};border:0;background:none;color:var(--tx)" onclick="toggleFi()">${V.fi?'Exclude friendly':'Include friendly'}</button></div>`+(V.pf?`<h2>Friendly jobs (${Fr.length})</h2><div class="card"><div class="mu">Result</div><div class="big">${m(F.p)}</div><div class="mu">on ${m(F.rev)} quoted · ${F.rev?Math.round(F.p/F.rev*100):0}% margin · kept separate from the totals above</div></div>${Fr.length?`<div class="card scroll"><table><tr><th>Job</th><th>Quote</th><th>Costs</th><th>Profit</th><th>%</th></tr>${frows}</table></div>`:''}`:''):'';
 return`<div class="row" style="margin-bottom:8px"><h1 style="margin:0">Stats</h1><select style="width:auto" onchange="V.yr=this.value;render()"><option value="all">All time</option>${yrs.map(y=>`<option ${V.yr==y?'selected':''}>${y}</option>`).join('')}</select></div>
 <div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;padding-bottom:2px">${STT.map(([k,l])=>`<button style="white-space:nowrap;${V.st==k?'background:var(--ac);color:var(--bg)':''}" onclick="V.st='${k}';render()">${l}</button>`).join('')}</div>${body}<div class="mu" style="margin:6px 0">${up.length?up.length+' upcoming job'+(up.length>1?'s':'')+' not counted until completed. ':''}${V.fi?'':'Friendly jobs are excluded.'}</div>${fsec}`}
+
+// ==== Quotes & invoices: business details, PDF creation, sending, getting paid ====
+// Everything here only ADDS fields (S.biz, S.issued, contact.addr/.vat, job.due/.pDate, docs[kind].gen/.due/.sent).
+const BZ=()=>S.biz||(S.biz={}),ISS=()=>S.issued||(S.issued=[]);
+const r2=n=>Math.round((+n+Number.EPSILON)*100)/100;
+const addDays=(d,n)=>{const x=new Date(d+'T12:00:00');x.setDate(x.getDate()+n);return ld(x)};
+const dLong=s=>/^\d{4}-\d\d-\d\d$/.test(s||'')?new Date(s+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):String(s||'');
+const cById=j=>S.contacts.find(c=>c.id==j.cid)||S.contacts.find(c=>jobMatches(j,c))||null;
+const isOd=j=>j.status=='Invoiced'&&(j.due?j.due<today():!!j.iDate&&dBetween(j.iDate,today())>30);
+const odDays=j=>j.due?dBetween(j.due,today()):dBetween(j.iDate,today())-30;
+const TA='font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:8px;width:100%';
+// ---- numbering: prefix + year + running number; never reuses a number, even after restoring an older backup ----
+const NK='evtnum',numHW=()=>{try{return JSON.parse(localStorage.getItem(NK))||{}}catch(e){return{}}};
+const reEsc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+function docPre(kind,date){const b=BZ();return(kind=='quote'?(b.qPre!=null?b.qPre:'Q-'):(b.iPre!=null?b.iPre:'INV-'))+String(date).slice(0,4)+'-'}
+function docNext(kind,date){const pre=docPre(kind,date),re=new RegExp('^'+reEsc(pre)+'(\\d+)$'),b=BZ(),yr=String(date).slice(0,4);let mx=0;
+const see=s=>{const q=re.exec(String(s||'').trim());if(q)mx=Math.max(mx,+q[1])};
+S.jobs.forEach(j=>{see(kind=='quote'?j.estNo:j.invNo);const d=(j.docs||{})[kind];if(d)see(d.no)});ISS().forEach(x=>{if(x.k==kind)see(x.no)});
+const st=kind=='quote'?b.qStart:b.iStart,sy=kind=='quote'?b.qStartY:b.iStartY;
+mx=Math.max(mx,+(numHW()[pre])||0,sy==yr?(+st||1)-1:0);
+return pre+String(mx+1).padStart(3,'0')}
+function numMark(kind,no,date){const pre=docPre(kind,date),q=new RegExp('^'+reEsc(pre)+'(\\d+)$').exec(no);if(!q)return;const h=numHW();if(+q[1]>(+h[pre]||0)){h[pre]=+q[1];try{localStorage.setItem(NK,JSON.stringify(h))}catch(e){}}}
+// ---- document builder: a job becomes fixed lines and totals that always add up ----
+const sumDesc=j=>(isBk(j)?'Equipment hire':'Event production services')+(j.event?': '+j.event:'');
+function docBuild(j,mode,desc){const c=calc(j),vt=j.friend?'none':(j.vat||'none'),rate=+j.vatRate||0;let items=[];
+j.lines.forEach(l=>{const g=G(l.g);items.push({desc:g.name,qty:l.q,rate:r2(lr(l)),amt:r2(lr(l)*l.q)})});
+(j.tasks||[]).forEach(t=>{if(+t.price)items.push({desc:t.name||'Service',qty:1,rate:r2(t.price),amt:r2(t.price)})});
+const sum=r2(items.reduce((a,x)=>a+x.amt,0));let net,vat,total;
+if(c.est){net=sum;vat=vt=='none'?0:r2(net*rate/100);total=r2(net+vat)}
+else if(vt=='incl'){total=r2(j.quote);net=r2(c.rev);vat=r2(total-net)}
+else{net=r2(c.rev);vat=vt=='excl'?r2(net*rate/100):0;total=r2(net+vat)}
+const diff=r2(net-sum),canItem=items.length>0,single=mode=='summary'||!canItem;
+if(single)items=[{desc:String(desc||'').trim()||sumDesc(j),qty:1,rate:net,amt:net}];
+else if(Math.abs(diff)>=0.005)items.push({desc:diff<0?'Discount':'Adjustment',qty:1,rate:diff,amt:diff,adj:true});
+return{items,net,vat,total,rate,vt,diff,canItem,single}}
+// ---- PDF (jsPDF + an embedded font so Maltese letters such as ħ, ġ, ż print correctly) ----
+let _pl;function pdfLibs(){return _pl||(_pl=Promise.all(['vendor/jspdf.umd.min.js','vendor/pdf-font.js'].map(s=>new Promise((res,rej)=>{const e=document.createElement('script');e.src=s;e.onload=res;e.onerror=()=>rej(new Error('the PDF maker could not load'));document.head.appendChild(e)}))).catch(e=>{_pl=null;throw e}))}
+async function pdfMake(j,kind,o){await pdfLibs();const b=BZ(),d=new window.jspdf.jsPDF({unit:'mm',format:'a4',compress:true});
+d.addFileToVFS('ev-r.ttf',EVT_FONT.r);d.addFont('ev-r.ttf','ev','normal');d.addFileToVFS('ev-b.ttf',EVT_FONT.b);d.addFont('ev-b.ttf','ev','bold');
+const L=18,R=192,LH=4.6,INK=[27,27,26],MU=[118,117,111],LN=[214,213,208],kq=kind=='quote',title=kq?'QUOTE':'INVOICE';
+const T=(s,x,y,op)=>{op=op||{};d.setFont('ev',op.b?'bold':'normal');d.setFontSize(op.s||9.5);d.setTextColor(...(op.c||INK));d.text(String(s),x,y,{align:op.a||'left'})};
+const wrap=(s,w,sz,bo)=>{d.setFont('ev',bo?'bold':'normal');d.setFontSize(sz||9.5);return String(s||'').split('\n').flatMap(p=>d.splitTextToSize(p.trim()||' ',w))};
+const rule=(y,x1,x2)=>{d.setDrawColor(...LN);d.setLineWidth(.2);d.line(x1==null?L:x1,y,x2==null?R:x2,y)};
+d.setProperties({title:title.charAt(0)+title.slice(1).toLowerCase()+' '+o.no,author:b.name||''});
+let y=18,hy=y;
+let logo=false;if(b.logo&&b.lw&&b.lh){const k=Math.min(52/b.lw,24/b.lh),w=b.lw*k,h=b.lh*k;try{d.addImage(b.logo,/^data:image\/png/.test(b.logo)?'PNG':'JPEG',L,y-4,w,h);hy=y-4+h;logo=true}catch(e){}}
+if(!logo){const nl=wrap(b.name||'',95,15,true);nl.forEach((s,i)=>T(s,L,y+2+i*6.5,{b:1,s:15}));hy=y+2+(nl.length-1)*6.5}
+T(title,R,y+3,{b:1,s:20,a:'right'});let ry=y+11;
+const meta=[['No.',o.no],['Date',dLong(o.date)]];if(o.due)meta.push([kq?'Valid until':'Due date',dLong(o.due)]);
+meta.forEach(([k,v])=>{T(v,R,ry,{a:'right'});T(k,R-40,ry,{c:MU,a:'right'});ry+=4.8});
+y=Math.max(hy,ry-4.8)+7;rule(y);y+=7;
+const from=[],ct=cById(j),to=[[(ct&&ct.name)||j.client||'',1]];
+if(b.name)from.push([b.name,1]);String(b.addr||'').split('\n').filter(x=>x.trim()).forEach(s=>from.push([s]));if(b.vat)from.push(['VAT no. '+b.vat]);[b.phone,b.email].filter(Boolean).forEach(s=>from.push([s]));
+String((ct&&ct.addr)||'').split('\n').filter(x=>x.trim()).forEach(s=>to.push([s]));if(ct&&ct.vat)to.push(['VAT no. '+ct.vat]);
+T('From',L,y,{c:MU,s:8});T(kq?'For':'Bill to',108,y,{c:MU,s:8});y+=5;
+const col=(arr,x,w)=>{let yy=y;arr.forEach(([s,bo])=>{wrap(s,w,9.5,bo).forEach(t=>{T(t,x,yy,{b:bo});yy+=LH})});return yy};
+y=Math.max(col(from,L,82),col(to,108,84))+4;
+const jd=[j.event,j.date?dLong(j.date):'',j.loc].filter(Boolean).join('  ·  ');
+if(jd){T(isBk(j)?'Booking':'Event',L,y,{c:MU,s:8});y+=5;wrap(jd,R-L).forEach(t=>{T(t,L,y);y+=LH});y+=4}
+const XQ=128,XR=160,head=()=>{T('Description',L,y,{c:MU,s:8});if(!o.single){T('Qty',XQ,y,{c:MU,s:8,a:'right'});T('Unit price',XR,y,{c:MU,s:8,a:'right'})}T('Amount',R,y,{c:MU,s:8,a:'right'});y+=2.4;rule(y);y+=5.6};
+head();
+o.items.forEach(it=>{const ls=wrap(it.desc,o.single?140:96);if(y+(ls.length-1)*LH+3>276){d.addPage();y=22;head()}
+ls.forEach((t,i)=>T(t,L,y+i*LH));if(!o.single&&!it.adj){T(String(+it.qty),XQ,y,{a:'right'});T(m(it.rate),XR,y,{a:'right'})}T(m(it.amt),R,y,{a:'right'});
+y+=(ls.length-1)*LH+2.6;rule(y);y+=5.4});
+const need=o.vt!='none'?24:12;if(y+need>280){d.addPage();y=24}
+y+=2;const tot=(l,v,bo)=>{T(l,XR,y,{a:'right',c:bo?INK:MU,b:bo,s:bo?11:9.5});T(v,R,y,{a:'right',b:bo,s:bo?11:9.5});y+=bo?7:5.4};
+if(o.vt!='none'){tot('Subtotal (excl. VAT)',m(o.net));tot('VAT '+(+o.rate)+'%',m(o.vat));rule(y-2.6,112,R);y+=2.6}
+tot(o.vt!='none'?'Total (incl. VAT)':'Total',m(o.total),1);
+const blocks=[];if(b.taxNote)blocks.push(['',b.taxNote]);
+if(!kq&&b.bank)blocks.push(['Payment details',b.bank]);
+if(o.due)blocks.push(['Terms',kq?'This quote is valid until '+dLong(o.due)+'.':'Payment is due by '+dLong(o.due)+'. Please use '+o.no+' as the payment reference.']);
+if(b.note)blocks.push(['Notes',b.note]);
+y+=5;blocks.forEach(([h,t])=>{const ls=wrap(t,R-L);if(y+(h?5:0)+ls.length*LH>282){d.addPage();y=24}if(h){T(h,L,y,{c:MU,s:8});y+=5}ls.forEach(s=>{T(s,L,y);y+=LH});y+=4});
+const n=d.getNumberOfPages();if(n>1)for(let i=1;i<=n;i++){d.setPage(i);T(o.no,L,289,{c:MU,s:8});T('Page '+i+' of '+n,R,289,{c:MU,s:8,a:'right'})}
+return d.output('blob')}
+// ---- create sheet ----
+function mkOpen(jid,kind){const j=J(jid),b=BZ(),ex=(j.docs||{})[kind],dt=today();let no,keep=false,voids='';
+if(ex&&ex.gen&&ex.no&&(kind=='quote'||!ex.sent)){no=ex.no;keep=true}else{no=docNext(kind,dt);if(ex&&ex.gen&&ex.sent&&kind=='invoice')voids=ex.no}
+V.pop={k:'mk',j:jid,kind,no,keep,voids,date:dt,due:addDays(dt,kind=='quote'?(+b.qValid||30):(+b.terms||14)),mode:b.mode||'lines',desc:sumDesc(j)};render()}
+function mkSheet(){const o=V.pop,j=J(o.j),b=BZ(),kq=o.kind=='quote',D=docBuild(j,o.mode,o.desc),ex=(j.docs||{})[o.kind],ct=cById(j),w=[];
+if(!b.name)w.push(`Your business details are empty, so the PDF will have no sender. <a href="#" style="color:inherit" onclick="event.preventDefault();go('biz')">Add them</a>`);
+if(!kq&&!(ct&&ct.addr))w.push('This client has no address saved. Add it under Clients &amp; vendors if the invoice needs one.');
+if(ex&&!ex.gen)w.push('This replaces the PDF you uploaded for this '+o.kind+'.');
+if(o.voids)w.push(esc(o.voids)+' was already sent, so it will be marked void and this one gets a new number.');
+else if(o.keep)w.push(kq?'This updates '+esc(o.no)+' with the job as it is now.':esc(o.no)+' has not been sent yet, so it is replaced and keeps its number.');
+if(D.total<=0)w.push('The total is zero. Add equipment, tasks or a quote value first.');
+const rows=D.items.map(l=>`<div class="row" style="margin-bottom:4px;align-items:flex-start"><span>${esc(l.desc)}${D.single||l.adj?'':`<div class="mu">Qty ${+l.qty} · ${m(l.rate)} each</div>`}</span><span style="white-space:nowrap">${m(l.amt)}</span></div>`).join('');
+return`<div class="mu" style="margin-bottom:8px">${esc(jt(j))}${j.event?' · '+esc(j.client):''}</div>
+${w.map(x=>`<div class="mu" style="margin-bottom:6px;color:var(--wa)">${x}</div>`).join('')}
+<div class="f"><div style="grid-column:1/-1"><label>${kq?'Quote':'Invoice'} number</label><input value="${esc(o.no)}" autocapitalize="off" onchange="V.pop.no=this.value.trim()"></div>
+<div><label>Date</label><input type="date" value="${o.date}" onchange="V.pop.date=this.value"></div>
+<div><label>${kq?'Valid until':'Due date'}</label><input type="date" value="${o.due||''}" onchange="V.pop.due=this.value"></div>
+${D.canItem?`<div style="grid-column:1/-1"><label>Show the client</label><select onchange="V.pop.mode=this.value;render()"><option value="lines" ${D.single?'':'selected'}>Every line (equipment and tasks)</option><option value="summary" ${D.single?'selected':''}>One summary line</option></select></div>`:''}
+${D.single?`<div style="grid-column:1/-1"><label>Description on the ${o.kind}</label><input value="${esc(o.desc||'')}" onchange="V.pop.desc=this.value;render()"></div>`:''}</div>
+<h2>On the ${o.kind}</h2><div class="card" style="margin-bottom:8px">${rows}<hr style="border:0;border-top:1px solid var(--ln)">
+<div class="sum">${D.vt!='none'?`<span class="mu">Subtotal (excl. VAT)</span><b>${m(D.net)}</b><span class="mu">VAT ${D.rate}%</span><b>${m(D.vat)}</b>`:''}<span>Total</span><b>${m(D.total)}</b></div></div>
+${!D.single&&Math.abs(D.diff)>=0.005?`<div class="mu" style="margin-bottom:8px">The job's quote value differs from its lines by ${m(Math.abs(D.diff))}, shown as ${D.diff<0?'a discount':'an adjustment'} so the ${o.kind} adds up.</div>`:''}
+${o.err?`<div style="color:var(--bad);margin-bottom:8px">${esc(o.err)}</div>`:''}
+<button class="p" style="width:100%" ${o.busy?'disabled':''} onclick="mkGo()">${o.busy?'Creating…':'Create PDF'}</button></div>`}
+async function mkGo(){const o=V.pop;if(!o||o.k!='mk'||o.busy)return;const j=J(o.j),kind=o.kind,no=String(o.no||'').trim(),er=t=>{o.busy=false;o.err=t;render()};
+if(!no)return er('Add a number.');if(!/^\d{4}-\d\d-\d\d$/.test(o.date||''))return er('Add a date.');
+if(kind=='invoice'&&(S.jobs.some(x=>x.id!=j.id&&String(x.invNo||'').trim()==no)||ISS().some(x=>x.k=='invoice'&&x.no==no&&(x.j!=j.id||x.void))))return er('Invoice number '+no+' is already used. Each invoice needs its own number.');
+const D=docBuild(j,o.mode,o.desc),ct=cById(j),cl=(ct&&ct.name)||j.client||'';
+const fname=((kind=='quote'?'Quote-':'Invoice-')+no+(cl?'-'+cl:'')).replace(/[^\w\-]+/g,'-').replace(/-+/g,'-').replace(/-$/,'').slice(0,80)+'.pdf';
+o.busy=true;o.err='';render();
+try{const blob=await pdfMake(j,kind,{...D,no,date:o.date,due:o.due}),f=new File([blob],fname,{type:'application/pdf',lastModified:Date.now()});
+await idbPut(j.id+':'+kind,f);
+if(o.voids)ISS().forEach(x=>{if(x.k=='invoice'&&x.no==o.voids&&x.j==j.id&&!x.void)x.void=today()});
+j.docs=j.docs||{};j.docs[kind]={pdf:true,gen:true,no,date:o.date,due:o.due,total:D.total,sub:D.net,tax:D.vat,file:fname,n:D.items.length,lines:D.items.map(l=>({desc:l.desc,qty:l.qty,rate:l.rate,amt:l.amt}))};
+const rec={k:kind,no,j:j.id,date:o.date,total:D.total,client:cl},e=ISS().find(x=>x.k==kind&&x.no==no&&x.j==j.id&&!x.void);if(e)Object.assign(e,rec);else ISS().push(rec);
+numMark(kind,no,o.date);
+if(kind=='quote'){j.estNo=no;j.qDate=o.date;if(j.status=='Meeting')j.status='Quoted'}else{j.invNo=no;j.iDate=o.date;j.due=o.due;delete j.pDate;if(j.status!='Paid')j.status='Invoiced'}
+V.pop=null;openDv(j.id,kind);toast((kind=='quote'?'Quote ':'Invoice ')+no+' created.')}
+catch(e){er('Could not create the PDF ('+(e&&e.message||e)+').')}}
+// ---- viewer extras: send, mark sent, mark paid, void ----
+let _dvb=null;
+function dvExtra(j,kd,d){const info=[],b=[];
+if(d&&d.gen){if(d.due)info.push((kd=='quote'?'Valid until ':'Due ')+dLong(d.due));info.push(d.sent?'Sent '+dLong(d.sent):`Not sent yet · <a href="#" style="color:inherit" onclick="event.preventDefault();docSent(${j.id},'${kd}')">mark as sent</a>`)}
+if(kd=='invoice'&&j.status=='Paid'&&j.pDate)info.push('Paid '+dLong(j.pDate));
+if(d&&d.pdf)b.push(`<button class="p" onclick="docSend(${j.id},'${kd}')">Send</button>`);
+if(!(kd=='invoice'&&j.friend))b.push(`<button onclick="mkOpen(${j.id},'${kd}')">${d&&d.gen?'Create again':'Create PDF'}</button>`);
+if(kd=='invoice'&&j.status=='Invoiced')b.push(`<button onclick="docPaid(${j.id})">Mark paid</button>`);
+if(kd=='invoice'&&d&&d.gen)b.push(`<button onclick="docVoid(${j.id})">Void</button>`);
+return(info.length?`<div class="mu" style="margin-top:8px">${info.join(' · ')}</div>`:'')+(b.length?`<div class="dvb" style="margin-top:6px">${b.join('')}</div>`:'')}
+function docDl(f){const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800);toast('Saved '+f.name+' to your downloads.')}
+function docSent(jid,kd){const d=(J(jid).docs||{})[kd];if(!d)return;d.sent=today();const x=ISS().find(x=>x.k==kd&&x.no==d.no&&x.j==jid&&!x.void);if(x)x.sent=d.sent;render();loadDv()}
+function docSend(jid,kd){const j=J(jid),d=(j.docs||{})[kd],b=_dvb;if(!d)return;if(!b){toast('The PDF is still loading. Try again in a moment.');return}
+const f=new File([b],/\.pdf$/i.test(d.file||'')?d.file:(kd=='quote'?'Quote':'Invoice')+(d.no?'-'+d.no:'')+'.pdf',{type:'application/pdf'});
+let can=false;try{can=!!(navigator.canShare&&navigator.canShare({files:[f]}))}catch(e){}
+if(!can){docDl(f);return}
+navigator.share({files:[f],title:(kd=='quote'?'Quote ':'Invoice ')+(d.no||'')}).then(()=>{if(d.gen)docSent(jid,kd)}).catch(e=>{if(!e||e.name!='AbortError')docDl(f)})}
+function docPaid(jid){const j=J(jid);j.status='Paid';j.pDate=today();render();loadDv();toast('Marked as paid.')}
+function docVoid(jid){const j=J(jid),d=(j.docs||{}).invoice;if(!d)return;V.del={k:'void',a:jid,btn:'Void invoice',msg:`Void invoice ${d.no}? Its number stays used and is never given out again, the PDF is removed from this job, and the job goes back to Delivered.`};render()}
+function docVoidDo(jid){const j=J(jid),d=(j.docs||{}).invoice;if(!d)return;
+ISS().forEach(x=>{if(x.k=='invoice'&&x.no==d.no&&x.j==jid&&!x.void)x.void=today()});
+delete j.docs.invoice;idb().then(db=>{try{db.transaction('f','readwrite').objectStore('f').delete(jid+':invoice')}catch(e){}}).catch(()=>{});
+j.invNo='';delete j.iDate;delete j.due;delete j.pDate;if(j.status=='Invoiced'||j.status=='Paid')j.status='Delivered';V.pop=null;render();toast('Invoice '+d.no+' voided.')}
+// ---- owed to you ----
+const owedJobs=()=>S.jobs.filter(j=>!j.friend&&j.status=='Invoiced').sort((a,b)=>(a.due||a.iDate||a.date)<(b.due||b.iDate||b.date)?-1:1);
+const jobTot=j=>{const c=calc(j);return c.rev+c.vatAmt};
+function owedSheet(){const l=owedJobs();return`<div class="big" style="margin:4px 0 2px">${m(l.reduce((a,j)=>a+jobTot(j),0))}</div><div class="mu" style="margin-bottom:10px">${l.length} unpaid invoice${l.length==1?'':'s'}, VAT included</div>`+
+(l.map(j=>`<div class="card" style="cursor:pointer;margin-bottom:6px" onclick="go('jobs',${j.id})"><div class="row"><span><b>${esc(jt(j))}</b><div class="mu">${j.event?esc(j.client)+' · ':''}${j.invNo?esc(j.invNo):'no number'}</div></span><b>${m(jobTot(j))}</b></div><div class="mu" style="${isOd(j)?'color:var(--bad)':''}">${isOd(j)?odDays(j)+' day'+(odDays(j)==1?'':'s')+' overdue':j.due?'Due '+dLong(j.due):j.iDate?'Invoiced '+dLong(j.iDate):''}</div></div>`).join('')||'<div class="mu">Nothing is waiting to be paid.</div>')+'</div>'}
+// ---- business details ----
+function bset(k,v){const b=BZ();b[k]=v;if(k=='qStart')b.qStartY=today().slice(0,4);if(k=='iStart')b.iStartY=today().slice(0,4);save()}
+function bizLogo(f){if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,600/im.width,300/im.height),w=Math.max(1,Math.round(im.width*k)),h=Math.max(1,Math.round(im.height*k)),c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(im,0,0,w,h);let u=c.toDataURL('image/png');
+if(u.length>140000){x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);u=c.toDataURL('image/jpeg',.85)}const b=BZ();b.logo=u;b.lw=w;b.lh=h;render()};im.onerror=()=>toast('That image could not be read.');im.src=r.result};r.readAsDataURL(f)}
+function bizView(){const b=BZ(),dt=today(),v=k=>esc(b[k]==null?'':b[k]),inp=(l,k,ex)=>`<div ${ex&&ex.full?'style="grid-column:1/-1"':''}><label>${l}</label><input ${ex&&ex.t?'type="'+ex.t+'"':''} ${ex&&ex.ph?'placeholder="'+esc(ex.ph)+'"':''} value="${ex&&ex.dv!=null&&b[k]==null?esc(ex.dv):v(k)}" onchange="bset('${k}',${ex&&ex.t=='number'?'+this.value||0':'this.value.trim()'})${ex&&ex.re?';render()':''}"></div>`,
+ta=(l,k,ph,rows)=>`<div style="grid-column:1/-1"><label>${l}</label><textarea rows="${rows||3}" style="${TA}" placeholder="${esc(ph||'')}" onchange="bset('${k}',this.value.trim())">${v(k)}</textarea></div>`;
+const iss=ISS().filter(x=>x.k=='invoice').slice().reverse();
+return`<button onclick="go('menu')">← Menu</button><h1 style="margin-top:12px">Business details</h1><div class="mu" style="margin-bottom:10px">These appear on the quotes and invoices you create from a job.</div>
+<div class="card"><div class="f" style="margin-top:0">${inp('Business name','name',{full:1})}${ta('Address','addr','Street\nTown, postcode\nCountry')}${inp('VAT number','vat',{ph:'MT12345678'})}${inp('Phone','phone',{t:'tel'})}${inp('Email','email',{t:'email',full:1})}
+<div style="grid-column:1/-1"><label>Logo</label><div class="row" style="justify-content:flex-start">${b.logo?`<img src="${b.logo}" alt="Logo" style="max-height:44px;max-width:140px;background:#fff;border-radius:6px;padding:4px">`:''}<input type="file" accept="image/*" id="blf" hidden onchange="bizLogo(this.files[0])"><button onclick="document.getElementById('blf').click()">${b.logo?'Replace':'Upload logo'}</button>${b.logo?`<button onclick="delete BZ().logo;render()">Remove</button>`:''}</div></div></div></div>
+<h2>On invoices</h2><div class="card"><div class="f" style="margin-top:0">${ta('Payment details','bank','Bank name\nIBAN\nBIC')}${inp('Payment terms (days)','terms',{t:'number',dv:14})}${inp('Quotes valid for (days)','qValid',{t:'number',dv:30})}${ta('Tax note under the totals (optional)','taxNote','Wording your accountant gives you, for example if you do not charge VAT',2)}${ta('Footer note (optional)','note','Thank you for your business',2)}
+<div style="grid-column:1/-1"><label>When a job's quote value differs from its lines, show the client</label><select onchange="bset('mode',this.value)"><option value="lines" ${b.mode=='summary'?'':'selected'}>Every line, plus a discount or adjustment line</option><option value="summary" ${b.mode=='summary'?'selected':''}>One summary line</option></select></div></div></div>
+<h2>Numbering</h2><div class="card"><div class="f" style="margin-top:0">${inp('Quote prefix','qPre',{dv:'Q-',re:1})}${inp('Invoice prefix','iPre',{dv:'INV-',re:1})}${inp('Start quotes at','qStart',{t:'number',ph:'1',re:1})}${inp('Start invoices at','iStart',{t:'number',ph:'1',re:1})}
+<div style="grid-column:1/-1" class="mu">Next quote <b style="color:var(--tx)">${esc(docNext('quote',dt))}</b> · next invoice <b style="color:var(--tx)">${esc(docNext('invoice',dt))}</b>. Numbers restart each year and are never reused. Set a start number once if you are continuing a sequence from elsewhere.</div></div></div>
+${iss.length?`<h2>Invoices issued (${iss.length})</h2><div class="card scroll"><table><tr><th>No.</th><th>Date</th><th>Client</th><th>Total</th></tr>${iss.slice(0,100).map(x=>`<tr ${J(x.j)?`onclick="go('jobs',${x.j})"`:''}><td>${esc(x.no)}${x.void?' <span class="chip bad">void</span>':''}</td><td>${dNice(x.date)}</td><td>${esc(x.client||'')}</td><td>${m(x.total)}</td></tr>`).join('')}</table></div>`:''}`}
 
 render();
 </script><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script>

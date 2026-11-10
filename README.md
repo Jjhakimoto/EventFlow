@@ -4,6 +4,7 @@ Single-file web app (index.html) that installs on an iPhone as a home-screen app
 
 - `index.html` the whole app
 - `manifest.webmanifest`, `sw.js`, `icons/` make it installable and offline
+- `vendor/` the PDF maker and font used to create quotes and invoices, bundled so it works offline
 - Data lives on the device (browser storage). Backups go to a separate PRIVATE repository from inside the app (Menu > Backup & restore > GitHub backup).
 
 Never commit business data to this repository.
