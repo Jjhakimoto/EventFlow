@@ -183,27 +183,37 @@ const c={o,r,t};ghMsg('Checking…');
 try{const x=await fetch(ghU(c),{headers:ghH(c)});if(x.status==401||x.status==403){ghMsg('GitHub refused that token.',true);return}if(x.status==404){ghMsg('Repository not found, or the token does not cover it.',true);return}
 const d=await x.json();if(d.private===false){ghMsg('That repository is public. Your business data would be visible to everyone. Make it private first.',true);return}
 c.last=0;localStorage.setItem('evtgh',JSON.stringify(c));ghMsg('Saved. Backing up…');await ghPush(true)}catch(e){ghMsg('Could not reach GitHub ('+e.message+').',true)}}
-async function ghPush(manual){const c=ghCfg();if(!c.t)return false;const body=JSON.stringify(S),h=ghHash(body);if(!manual&&c.h==h)return true;
-try{let sha;const g=await fetch(ghU(c,'/contents/'+ghPath),{headers:ghH(c)});if(g.ok)sha=(await g.json()).sha;else if(g.status!=404)throw new Error('read '+g.status);
-const b64=btoa(unescape(encodeURIComponent(body)));
-const r=await fetch(ghU(c,'/contents/'+ghPath),{method:'PUT',headers:{...ghH(c),'Content-Type':'application/json'},body:JSON.stringify({message:'Backup '+new Date().toISOString(),content:b64,sha})});
-if(!r.ok)throw new Error('write '+r.status);
-c.h=h;delete c.err;c.last=Date.now();localStorage.setItem('evtgh',JSON.stringify(c));ghMsg('Backed up to GitHub '+new Date(c.last).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+'.');return true}
+const ghB64=async b=>{const u=new Uint8Array(await b.arrayBuffer());let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
+async function ghPut(c,path,b64,msg){let sha;const g=await fetch(ghU(c,'/contents/'+path),{headers:ghH(c)});if(g.ok)sha=(await g.json()).sha;else if(g.status!=404)throw new Error('read '+g.status);
+const r=await fetch(ghU(c,'/contents/'+path),{method:'PUT',headers:{...ghH(c),'Content-Type':'application/json'},body:JSON.stringify({message:msg,content:b64,sha})});if(!r.ok)throw new Error('write '+r.status)}
+const pdfKeys=()=>{const k=[];S.jobs.forEach(j=>['quote','invoice'].forEach(x=>{if(j.docs&&j.docs[x]&&j.docs[x].pdf)k.push(j.id+':'+x)}));return k};
+async function ghPdfSync(){const c=ghCfg();c.p=c.p||{};let n=0;
+for(const k of pdfKeys()){const b=await idbGet(k).catch(()=>null);if(!b)continue;const sig=b.size+':'+(b.lastModified||0);if(c.p[k]===sig)continue;
+await ghPut(c,'pdfs/'+k.replace(':','-')+'.pdf',await ghB64(b),'PDF '+k);c.p[k]=sig;n++;const cc=ghCfg();cc.p=c.p;localStorage.setItem('evtgh',JSON.stringify(cc))}return n}
+async function ghPush(manual){const c=ghCfg();if(!c.t)return false;const body=JSON.stringify(S),h=ghHash(body);
+try{if(manual||c.h!=h){const b64=btoa(unescape(encodeURIComponent(body)));await ghPut(c,ghPath,b64,'Backup '+new Date().toISOString());const c1=ghCfg();c1.h=h;localStorage.setItem('evtgh',JSON.stringify(c1))}
+const np=await ghPdfSync();const c2=ghCfg();delete c2.err;c2.last=Date.now();localStorage.setItem('evtgh',JSON.stringify(c2));
+ghMsg('Backed up to GitHub '+new Date(c2.last).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+(np?' ('+np+' PDF'+(np>1?'s':'')+' too)':'')+'.');return true}
 catch(e){const c2=ghCfg();c2.err=String(e.message||e);localStorage.setItem('evtgh',JSON.stringify(c2));ghMsg('Backup failed ('+e.message+'). It will retry.',true);return false}}
+async function ghRestorePdfs(){const c=ghCfg();if(!c.t)return 0;let n=0;
+try{for(const k of pdfKeys()){if(await idbGet(k).catch(()=>null))continue;
+const r=await fetch(ghU(c,'/contents/pdfs/'+k.replace(':','-')+'.pdf'),{headers:{...ghH(c),Accept:'application/vnd.github.raw+json'}});if(!r.ok)continue;
+await idbPut(k,new Blob([await r.arrayBuffer()],{type:'application/pdf'}));n++}}catch(e){}
+if(n)ghMsg('Restored '+n+' PDF'+(n>1?'s':'')+' from GitHub.');return n}
 async function ghRestore(){const c=ghCfg();if(!c.t){ghMsg('Set up GitHub backup first.',true);return}
 try{const r=await fetch(ghU(c,'/contents/'+ghPath),{headers:{...ghH(c),Accept:'application/vnd.github.raw+json'}});if(!r.ok)throw new Error(r.status==404?'no backup in the repository yet':'read '+r.status);
-document.getElementById('bki').value=await r.text();ghMsg('Backup loaded below. Press Restore to apply it.')}catch(e){ghMsg('Could not load ('+e.message+').',true)}}
+document.getElementById('bki').value=await r.text();ghMsg('Backup loaded below. Press Restore to apply it (PDFs come back with it).')}catch(e){ghMsg('Could not load ('+e.message+').',true)}}
 function ghOff(){localStorage.removeItem('evtgh');V.ghm=null;render()}
 function ghBlock(){const c=ghCfg(),on=ghOk(),m=V.ghm;
 return`<div class="card" style="margin:0 0 14px"><b>GitHub backup</b>${on?`<div class="mu" style="margin:4px 0 8px">On, saving to ${esc(c.o)}/${esc(c.r)} automatically${c.last?'. Last: '+new Date(c.last).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''}.</div><div style="display:flex;gap:6px"><button style="flex:1" onclick="ghPush(true)">Back up now</button><button style="flex:1" onclick="ghRestore()">Load latest</button><button style="flex:1" onclick="ghOff()">Turn off</button></div>`
-:`<div class="mu" style="margin:4px 0 8px">Saves your data to a <b>private</b> GitHub repository, every time it changes. Use a token limited to that one repository.</div><div class="f"><div><label>GitHub user</label><input id="gho" autocapitalize="off" value="${esc(c.o||'')}"></div><div><label>Repository</label><input id="ghr" autocapitalize="off" value="${esc(c.r||'')}"></div><div style="grid-column:1/-1"><label>Token</label><input id="ght" type="password" autocomplete="off" placeholder="github_pat_…"></div><div style="grid-column:1/-1"><button class="p" style="width:100%" onclick="ghSaveCfg()">Save and back up</button></div></div>`}
+:`<div class="mu" style="margin:4px 0 8px">Saves your data and uploaded PDFs to a <b>private</b> GitHub repository, every time they change. Use a token limited to that one repository.</div><div class="f"><div><label>GitHub user</label><input id="gho" autocapitalize="off" value="${esc(c.o||'')}"></div><div><label>Repository</label><input id="ghr" autocapitalize="off" value="${esc(c.r||'')}"></div><div style="grid-column:1/-1"><label>Token</label><input id="ght" type="password" autocomplete="off" placeholder="github_pat_…"></div><div style="grid-column:1/-1"><button class="p" style="width:100%" onclick="ghSaveCfg()">Save and back up</button></div></div>`}
 <div id="ghm" class="mu" style="margin-top:6px;${m&&m.bad?'color:var(--bad)':m?'color:var(--ok)':''}">${m?esc(m.m):(c.err&&on?'Last attempt failed: '+esc(c.err):'')}</div></div>`}
 let _ghT=0;function ghAuto(){if(!ghOk()||Date.now()-_ghT<20000)return;_ghT=Date.now();ghPush(false)}
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 setInterval(ghAuto,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState=='hidden')ghAuto()});setTimeout(ghAuto,4000);
 function bkDownload(){const b=new Blob([JSON.stringify(S)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='events-backup-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 function bkCopy(){const t=document.getElementById('bko');t.select();try{navigator.clipboard.writeText(t.value)}catch(e){document.execCommand('copy')}toast('Copied')}
-function bkRestore(){const t=document.getElementById('bki').value.trim();try{let n=JSON.parse(t);if(typeof n=='string')n=JSON.parse(n);if(!n||!Array.isArray(n.jobs)||!Array.isArray(n.gear))throw 0;S=n;S.alias=S.alias||{};S.payments=S.payments||[];save();V.pop=null;V.job=null;go('jobs');toast('Restored '+S.jobs.length+' jobs')}catch(e){document.getElementById('bkm').textContent="That doesn't look like a backup."}}
+function bkRestore(){const t=document.getElementById('bki').value.trim();try{let n=JSON.parse(t);if(typeof n=='string')n=JSON.parse(n);if(!n||!Array.isArray(n.jobs)||!Array.isArray(n.gear))throw 0;S=n;S.alias=S.alias||{};S.payments=S.payments||[];save();if(typeof ghOk=='function'&&ghOk())setTimeout(ghRestorePdfs,300);V.pop=null;V.job=null;go('jobs');toast('Restored '+S.jobs.length+' jobs')}catch(e){document.getElementById('bkm').textContent="That doesn't look like a backup."}}
 function newJob(){const j={id:nid(S.jobs),client:'New client',event:'',date:d0(7),status:'Meeting',quote:0,vat:'excl',vatRate:18,lines:[],tasks:[]};S.jobs.push(j);go('jobs',j.id);V.pop={k:'jedit',id:j.id,isNew:true};render()}
 function set(id,k,v){const j=J(id);if(k=='status'){if(v=='Quoted'&&!j.qDate)j.qDate=today();if(v=='Invoiced'&&!j.iDate)j.iDate=today()}j[k]=['quote','vatRate'].includes(k)?+v:k=='friend'?v==='1':v;render()}
 function jobView(){const j=J(V.job),c=calc(j);
