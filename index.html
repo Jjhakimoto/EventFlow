@@ -64,7 +64,16 @@ select.ph{color:var(--mu)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--c-sound:#a78bfa;--c-light:#e07fc0;--c-visual:#4cc9b5}}
 :root[data-theme="dark"]{--c-sound:#a78bfa;--c-light:#e07fc0;--c-visual:#4cc9b5}
 .tcard{border-left:4px solid var(--tc)}.chip.tc{color:var(--tc);border-color:var(--tc)}
-</style></head><body><main id="app"></main>
+#wel{position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;cursor:pointer;opacity:1;transition:opacity .6s ease}#wel.off{opacity:0;pointer-events:none}#wel .wm{font-size:34px;font-weight:600;letter-spacing:-.02em}#wel .wg{color:var(--mu);font-size:15px}#wel .wl{width:36px;height:2px;background:var(--ac);border-radius:2px;margin:10px 0;animation:wl 3s ease-out forwards}@keyframes wl{from{width:0}to{width:80px}}#wel .wh{position:absolute;bottom:calc(40px + env(safe-area-inset-bottom,0px));color:var(--mu);font-size:12px}
+</style></head><body><div id="wel" onclick="welHide()"><div class="wm">EventFlow</div><div class="wl"></div><div class="wg" id="welg"></div><div class="wh">Tap to continue</div></div><main id="app"></main><script>(function(){var K="evtlast",W=5*60000,e=document.getElementById("wel"),t;
+function now(){return Date.now()}function last(){try{return +localStorage.getItem(K)||0}catch(x){return 0}}function stamp(){try{localStorage.setItem(K,now())}catch(x){}}
+function greet(){var h=new Date().getHours();document.getElementById("welg").textContent=(h<12?"Good morning":h<18?"Good afternoon":"Good evening")+" \u2014 let's get your jobs sorted"}
+window.welHide=function(){clearTimeout(t);if(e.className=="off")return;e.className="off";stamp()};
+function show(){greet();e.className="";clearTimeout(t);t=setTimeout(welHide,3000)}
+var l=last();if(!l||now()-l>W)show();else{e.style.transition="none";e.className="off";setTimeout(function(){e.style.transition=""},50)}
+stamp();setInterval(function(){if(e.className=="off")stamp()},30000);
+document.addEventListener("visibilitychange",function(){if(document.hidden){stamp()}else if(now()-last()>W)show();else stamp()});
+window.addEventListener("pagehide",stamp)})()</script>
 <nav id="nav"></nav><input type="file" id="docf" accept="application/pdf" hidden onchange="readDoc(this.files[0])"><div id="ptr" style="display:none;position:fixed;left:50%;top:10px;transform:translateX(-50%);background:var(--card);border:1px solid var(--ln);color:var(--tx);padding:6px 14px;border-radius:99px;font-size:13px;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,.15)"></div><div id="toast" style="display:none;position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ac);color:var(--bg);padding:10px 14px;border-radius:10px;font-size:14px;z-index:20;max-width:calc(100% - 32px);text-align:center"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
