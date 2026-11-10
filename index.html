@@ -134,11 +134,11 @@ if(o.k=='ttedit'){const x=S.taskTypes.find(y=>y.id==o.id);x.name=n;x.price=pr;V.
 let x=dup;if(!x){x={id:nid(S.taskTypes),name:n,price:pr};S.taskTypes.push(x)}
 if(o.ret&&o.tid){const t=J(o.jid).tasks.find(y=>y.id==o.tid);t.name=x.name;if(!(+t.price)&&x.price)t.price=x.price}
 V.pop=o.ret||null;render()}
-function tasksView(){const use=n=>S.jobs.reduce((a,j)=>a+(j.tasks||[]).filter(t=>String(t.name).trim().toLowerCase()==n.toLowerCase()).length,0);
+function tasksView(){const use=n=>ttJobs(n).reduce((a,j)=>a+j.tasks.filter(t=>String(t.name).trim().toLowerCase()==n.trim().toLowerCase()).length,0);
 const l=S.taskTypes.slice().sort((a,b)=>a.name.localeCompare(b.name));
-return`<h1>Task list</h1><div class="mu" style="margin-bottom:10px">Tasks you usually have on jobs. Pick them from the dropdown when adding a task to a job.</div>`+(l.map(x=>`<div class="card"><div class="row"><span><b>${esc(x.name)}</b><div class="mu">${use(x.name)} use${use(x.name)==1?'':'s'} in jobs${x.price?' · default '+m(x.price):''}</div></span><span style="white-space:nowrap"><button class="x" title="Edit" onclick="V.pop={k:'ttedit',id:${x.id}};render()">✎</button><button class="x" title="Delete" onclick="askDel('tt',${x.id})">✕</button></span></div></div>`).join('')||'<div class="mu">No task types yet.</div>')+(V.pop?'':`<button class="fab" aria-label="Add task type" onclick="V.pop={k:'ttnew'};render()">+</button>`)}
+return`<h1>Task list</h1><div class="mu" style="margin-bottom:10px">Tasks you usually have on jobs. Pick them from the dropdown when adding a task to a job.</div>`+dupBanner('tt')+(l.map(x=>`<div class="sw"><div class="swa"><button onclick="dupItem('taskTypes',${x.id})">Duplicate</button><button class="d" onclick="askDel('tt',${x.id})">Delete</button></div><div class="card" onclick="swTapE('ttview',${x.id})"><div class="row"><b>${esc(x.name)}</b></div><div class="row" style="margin-top:2px"><span class="mu">${use(x.name)} use${use(x.name)==1?'':'s'} in jobs${x.price?' · default '+m(x.price):''}</span></div></div></div>`).join('')||'<div class="mu">No task types yet.</div>')+(V.pop?'':`<button class="fab" aria-label="Add task type" onclick="V.pop={k:'ttnew'};render()">+</button>`)}
 function render(){if(!S.taskTypes)seedTT();
-const T=[['home','Home'],['jobs','Jobs'],['avail','Availability'],['gear','Gear'],['menu','Menu']],inMenu=['menu','crew','pay','venues','tasks','contacts','profit'];
+const T=[['home','Home'],['jobs','Jobs'],['avail','Calendar'],['menu','Menu']],inMenu=['menu','gear','crew','pay','venues','tasks','contacts','profit'];
 nav.innerHTML=T.map(([k,l])=>`<button class="${V.tab==k||(k=='menu'&&inMenu.includes(V.tab))?'on':''}" onclick="go('${k}')">${l}</button>`).join('');
 app.innerHTML=({venues:venuesView,tasks:tasksView,home:homeView,pay:payView,jobs:V.job?jobView:jobsView,avail:availView,gear:gearView,crew:crewView,menu:menuView,contacts:contactsView,profit:profitView})[V.tab]()+popup()+delDlg();app.querySelectorAll('input[type=number]').forEach(i=>{if(!i.getAttribute('step')){i.step='any';i.inputMode='decimal'}});save()}
 const today=()=>{const n=new Date();return n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())};
@@ -163,8 +163,8 @@ document.addEventListener('touchstart',e=>{PT.on=scrollY<=0&&!V.pop&&!V.del&&e.t
 document.addEventListener('touchmove',e=>{if(!PT.on)return;const t=e.touches[0],dy=t.clientY-PT.y,dx=t.clientX-PT.x;if(scrollY>0||Math.abs(dx)>Math.abs(dy)){return}const el=document.getElementById('ptr');if(dy>12){PT.rd=dy>80;el.style.display='block';el.textContent=PT.rd?'Release to refresh':'Pull to refresh';el.style.top=Math.min(60,10+dy/3)+'px'}else el.style.display='none'},{passive:true});
 document.addEventListener('touchend',()=>{if(!PT.on)return;PT.on=false;const el=document.getElementById('ptr');if(PT.rd){PT.rd=false;doRefresh()}else el.style.display='none'});
 let SW={x:0,y:0,el:null,dx:0,dir:'',open:null};
-function swTapE(k,id){if(SW.moved){SW.moved=false;return}if(SW.open){closeSw();return}if(k=='cview'){V.pop={k,id};render()}else openEdit({k,id})}
-function dupItem(kind,id){const arr=S[kind],o=arr.find(x=>x.id==id),c=JSON.parse(JSON.stringify(o));c.id=nid(arr);c.name=o.name+' (copy)';arr.push(c);SW.open=null;V.pop={k:kind=='gear'?'gedit':'cedit',id:c.id};render()}
+function swTapE(k,id){if(SW.moved){SW.moved=false;return}if(SW.open){closeSw();return}if(k=='cview'||k=='ttview'){V.pop={k,id};render()}else openEdit({k,id})}
+function dupItem(kind,id){const arr=S[kind],o=arr.find(x=>x.id==id),c=JSON.parse(JSON.stringify(o));c.id=nid(arr);c.name=o.name+' (copy)';arr.push(c);SW.open=null;V.pop={k:kind=='gear'?'gedit':kind=='taskTypes'?'ttedit':'cedit',id:c.id};render()}
 function swTap(id){if(SW.moved){SW.moved=false;return}if(SW.open){closeSw();return}go('jobs',id)}
 function closeSw(){if(SW.open){const p=SW.open.parentNode;SW.open.style.transform='';SW.open=null;setTimeout(()=>p.classList.remove('on'),220)}}
 function dupJob(id){const o=J(id),j=JSON.parse(JSON.stringify(o));j.id=nid(S.jobs);j.event=(o.event||o.client)+' (copy)';delete j.estNo;delete j.invNo;delete j.docs;delete j.pays;delete j.qDate;delete j.iDate;j.lines.forEach(l=>{delete l.ret});S.jobs.push(j);SW.open=null;go('jobs',j.id);V.pop={k:'jedit',id:j.id,isNew:true};render()}
@@ -317,7 +317,7 @@ else if(k=='crew'){const p=C(a),n=S.jobs.filter(j=>j.tasks.some(t=>t.assign.some
 else if(k=='contact'){const c=S.contacts.find(x=>x.id==a),n=S.jobs.filter(j=>jobMatches(j,c)).length;msg=`Delete "${c.name}" from your clients & vendors?`+(n?` ${n} job${n>1?'s':''} reference them.`:'')}
 else if(k=='task'){msg=`Delete the task "${J(a).tasks.find(x=>x.id==b).name||'Untitled'}" and its crew assignments?`}
 else if(k=='venue'){msg=`Delete the venue "${S.venues.find(x=>x.id==a).name}" and its contact people? Jobs keep their location text.`}
-else if(k=='tt'){msg=`Delete the task type "${S.taskTypes.find(x=>x.id==a).name}" from your list? Tasks already on jobs keep their names.`}
+else if(k=='tt'){{const n=ttJobs(S.taskTypes.find(x=>x.id==a).name).length;msg=`Delete the task type "${S.taskTypes.find(x=>x.id==a).name}" from your list?${n?` It is used on ${n} job${n>1?'s':''}, which keep the task name and are not changed.`:''}`}}
 else if(k=='job'){msg=`Delete the job "${jt(J(a))}" with its equipment and tasks?`}
 else if(k=='pay'){const p=S.payments.find(x=>x.id==a);msg=`Delete the ${m(p.amt)} payment to ${C(p.c).name}?`}
 else if(k=='line'){const l=J(a).lines[b];msg=`Remove ${l.q} × ${G(l.g).name} from this job?`}
@@ -378,6 +378,12 @@ ${u.js.length&&cands.length?`<div class="card" style="margin-bottom:6px"><b>Repl
 ${u.cl.length?`<label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:14px"><input type="checkbox" style="width:auto" ${o.cl?'checked':''} onchange="V.pop.cl=this.checked;render()">Also change the ${u.cl.length} completed job${u.cl.length==1?'':'s'}</label>`:''}${prev}
 <button class="${o.cl?'dng':'p'}" style="width:100%;margin-top:8px" ${o.to?'':'disabled'} onclick="itemReplace()">${o.cl?'Replace and change completed jobs':'Replace'}</button></div>`:''}
 <button style="width:100%" onclick="V.pop=null;render()">Cancel, change nothing</button></div>`}
+if(V.pop.k=='ttview'){const x=S.taskTypes.find(y=>y.id==V.pop.id);if(!x){V.pop=null;return''}
+const js=ttJobs(x.name),oth=S.taskTypes.filter(y=>y.id!=x.id).sort((a,b)=>a.name.localeCompare(b.name));
+const rows=js.map(j=>`<div class="row" style="padding:8px 0;border-top:1px solid var(--ln);cursor:pointer;align-items:flex-start" onclick="go('jobs',${j.id});V.pop=null;render()"><span><b>${esc(jt(j))}</b><div class="mu">${j.date}</div></span><span class="chip">${isUp(j)?'Upcoming':esc(j.status)}</span></div>`).join('');
+return top(esc(x.name))+`<div class="row" style="margin-bottom:8px"><span class="mu">${x.price?'Default price '+m(x.price):'No default price'}</span><button class="x" title="Edit task type" aria-label="Edit task type" onclick="V.pop={k:'ttedit',id:${x.id}};render()">✎</button></div>
+<h2 style="margin:8px 0 2px">Used on ${js.length} job${js.length==1?'':'s'}</h2>${rows||'<div class="mu">Not used on any job yet.</div>'}
+${oth.length?`<div style="margin-top:14px"><label>Merge into another task type</label><select onchange="ttMerge(${x.id},this.value)"><option value="">Choose…</option>${oth.map(y=>`<option value="${y.id}">${esc(y.name)}</option>`).join('')}</select><div class="mu" style="margin-top:4px">You will see exactly what changes before anything is merged.</div></div>`:''}</div>`}
 if(V.pop.k=='ttnew'||V.pop.k=='ttedit'){const o=V.pop,x=o.k=='ttedit'?S.taskTypes.find(y=>y.id==o.id):null;return top(x?'Edit task type':'New task type')+`<div class="f"><div style="grid-column:1/-1"><label>Name</label><input id="ttn" value="${esc(x?x.name:'')}" placeholder="e.g. Light operator"></div><div style="grid-column:1/-1"><label>Default price (€), optional</label><input id="ttp" type="number" step="0.01" value="${x&&x.price?x.price:''}" placeholder="Used when you add it to a job"></div>${x?'<div class="mu" style="grid-column:1/-1">Renaming only changes the list. Tasks already on jobs keep their names.</div>':''}<div style="grid-column:1/-1"><button class="p" style="width:100%" onclick="saveTT()">${x?'Save':'Add task type'}</button></div></div></div>`}
 if(V.pop.k=='cview'){const p=C(V.pop.id);if(!p||p.name=='?'){V.pop=null;return''}
 const mine=S.jobs.filter(j=>(j.tasks||[]).some(t=>t.assign.some(a=>a.c==p.id))).sort((a,b)=>a.date<b.date?1:-1);
@@ -627,7 +633,7 @@ function shiftMonth(n){const [y,mo]=V.cm.split('-').map(Number),d=new Date(y,mo-
 function availView(){if(!V.cm)V.cm=V.date.slice(0,7);
 const seg=[['cal','Calendar'],['day','Day']].map(([k,l])=>`<button class="${V.av==k?'p':''}" style="padding:4px 14px;font-size:13px" onclick="V.av='${k}';render()">${l}</button>`).join('');
 const [y,mo]=V.cm.split('-').map(Number),title=new Date(y,mo-1,1).toLocaleDateString('en-GB',{month:'long',year:'numeric'});
-const head=`<div class="row" style="margin-bottom:12px"><h1 style="margin:0">Availability</h1><span style="display:flex;gap:6px">${seg}</span></div>`;
+const head=`<div class="row" style="margin-bottom:12px"><h1 style="margin:0">Calendar</h1><span style="display:flex;gap:6px">${seg}</span></div>`;
 if(V.av=='day')return head+`<input type="date" value="${V.date}" onchange="if(this.value){V.date=this.value;V.cm=this.value.slice(0,7)}render()">`+dayPanel(V.date);
 return head+`<div class="row" style="margin-bottom:8px"><button class="x" style="font-size:16px;padding:2px 12px" aria-label="Previous month" onclick="shiftMonth(-1)">‹</button><b>${title}</b><span style="display:flex;gap:6px"><button class="x" onclick="V.date=ld(new Date());V.cm=V.date.slice(0,7);render()">Today</button><button class="x" style="font-size:16px;padding:2px 12px" aria-label="Next month" onclick="shiftMonth(1)">›</button></span></div>`
 +calGrid()+`<div class="mu" style="margin:8px 0 4px"><span class="dot eq"></span>Equipment <span class="dot cr" style="margin-left:10px"></span>Crew <span class="dot cl" style="margin-left:10px"></span>Equipment clash</div>`+dayPanel(V.date)}
@@ -693,7 +699,7 @@ let h='',last=null;
 a.forEach(p=>{if(V.cs=='type'){const k=ty(p);if(k!==last){last=k;h+=`<h2>${TL[k]}</h2>`}}
 const r=cRig(p),o=cOp(p),sm=r&&o&&cSame(p);
 const ow=S.jobs.filter(j=>!isUp(j)).reduce((x,j)=>x+Math.max(0,owedBy(j,p.id)-paidBy(j,p.id)),0),any=S.jobs.some(j=>owedBy(j,p.id)>0||paidBy(j,p.id)>0);
-h+=`<div class="sw"><div class="swa"><button onclick="dupItem('crew',${p.id})">Duplicate</button><button class="d" onclick="askDel('crew',${p.id})">Delete</button></div><div class="card" onclick="swTapE('cview',${p.id})"><div class="row"><span style="display:flex;align-items:center;gap:6px"><b>${esc(p.name)}</b>${ow>0.004?`<button class="x" title="Unpaid: ${m(ow)}" aria-label="Unpaid ${m(ow)}" style="color:var(--wa);border-color:var(--wa)" onclick="event.stopPropagation();openPay(${p.id})">⚠</button>`:''}</span></div><div class="row" style="margin-top:2px"><span class="mu">${!r&&!o?'No roles set':sm?'Rigging & operating · '+m(p.rig)+'/h':[r?'Rigging '+m(p.rig)+'/h':'',o?'Operating '+m(p.op)+'/h':''].filter(Boolean).join(' · ')}</span></div></div></div>`});
+h+=`<div class="sw"><div class="swa"><button onclick="dupItem('crew',${p.id})">Duplicate</button><button class="d" onclick="askDel('crew',${p.id})">Delete</button></div><div class="card" onclick="swTapE('cview',${p.id})"><div class="row"><b>${esc(p.name)}</b>${ow>0.004?`<button class="x" title="Unpaid: ${m(ow)}" aria-label="Unpaid ${m(ow)}" style="color:var(--wa);border-color:var(--wa);width:auto;padding:2px 10px;font-size:13px" onclick="event.stopPropagation();openPay(${p.id})">Unpaid</button>`:''}</div><div class="row" style="margin-top:2px"><span class="mu">${!r&&!o?'No roles set':sm?'Rigging & operating · '+m(p.rig)+'/h':[r?'Rigging '+m(p.rig)+'/h':'',o?'Operating '+m(p.op)+'/h':''].filter(Boolean).join(' · ')}</span></div></div></div>`});
 return dupBanner('crew')+(h||'<div class="mu">No crew yet.</div>')+archList('crew')}
 const owedBy=(j,cid)=>(j.tasks||[]).reduce((x,t)=>x+t.assign.filter(a=>a.c==cid).reduce((y,a)=>y+payOf(a),0),0);
 const PA=cid=>(S.payments||[]).filter(p=>p.c==cid);
@@ -833,23 +839,27 @@ const sec=(t,rows)=>`<h2>${t}</h2><div class="card mgrp">${rows.join('')}</div>`
 return`<h1>Menu</h1>`+
 sec('People & places',[row("go('crew')",'Crew',S.crew.filter(x=>!x.arch).length),row("go('venues')",'Venues',(S.venues||[]).length),row("go('contacts')",'Clients & vendors',S.contacts.length)])+
 sec('Money',[row("go('pay')",'Payments',owed>0.004?'You owe '+m(owed):'All settled',owed>0.004?'var(--wa)':''),row("go('profit')",'Stats','')])+
-sec('Library',[row("go('tasks')",'Task list',(S.taskTypes||[]).length+' types')])+
+sec('Library',[row("go('gear')",'Gear',S.gear.filter(x=>!x.arch).length),row("go('tasks')",'Task list',(S.taskTypes||[]).length+' types')])+
 sec('Your data',[row("V.pop={k:'bk'};render()",'Backup &amp; restore',bk,bkc)].concat(pm?[row("V.pop={k:'undomerge'};render()",'Undo last merge',new Date(pm.t).toLocaleDateString('en-GB',{day:'numeric',month:'short'}))]:[]))}
 // ---- duplicate detection & safe merge ----
 const dpKey=(k,a,b)=>k+':'+Math.min(a,b)+'-'+Math.max(a,b);
-const dpList=k=>k=='gear'?S.gear.filter(x=>!x.arch):k=='crew'?S.crew.filter(x=>!x.arch):S.contacts;
+const dpList=k=>k=='gear'?S.gear.filter(x=>!x.arch):k=='crew'?S.crew.filter(x=>!x.arch):k=='tt'?(S.taskTypes||[]):S.contacts;
+const ttJobs=n=>S.jobs.filter(j=>(j.tasks||[]).some(t=>String(t.name).trim().toLowerCase()==String(n).trim().toLowerCase())).sort((a,b)=>a.date<b.date?1:-1);
+function ttMerge(id,v){if(!v)return;V.pop={k:'merge',kind:'tt',a:id,b:+v,keep:id,ack:false};render()}
 const dpSame=(a,b)=>{const x=norm(a),y=norm(b);return !!x&&(x==y||x.replace(/ /g,'')==y.replace(/ /g,'')||sim(a,b)>=0.95&&toks(a).length==toks(b).length)};
 function findDups(k){const l=dpList(k),out=[];for(let i=0;i<l.length;i++)for(let j=i+1;j<l.length;j++)if(dpSame(l[i].name,l[j].name)&&!(S.nodup||[]).includes(dpKey(k,l[i].id,l[j].id)))out.push([l[i].id,l[j].id]);return out}
 function dupBanner(k){const n=findDups(k).length;return n?`<div class="card" style="border-color:var(--wa);cursor:pointer" onclick="openMerge('${k}')"><div class="row"><span>⚠ <b>${n} possible duplicate${n>1?'s':''}</b><div class="mu">Review and merge safely</div></span><span class="mu">Review ›</span></div></div>`:''}
 function openMerge(k){const d=findDups(k)[0];if(!d){V.pop=null;render();return}V.pop={k:'merge',kind:k,a:d[0],b:d[1],keep:d[0],ack:false};render()}
-const dpItem=(k,id)=>k=='gear'?G(id):k=='crew'?C(id):S.contacts.find(x=>x.id==id);
-function dpJobs(k,id){if(k=='contact'){const c=S.contacts.find(x=>x.id==id);return S.jobs.filter(j=>jobMatches(j,c))}return refJobs(k,id)}
+const dpItem=(k,id)=>k=='gear'?G(id):k=='crew'?C(id):k=='tt'?S.taskTypes.find(x=>x.id==id):S.contacts.find(x=>x.id==id);
+function dpJobs(k,id){if(k=='tt')return ttJobs(dpItem('tt',id).name);if(k=='contact'){const c=S.contacts.find(x=>x.id==id);return S.jobs.filter(j=>jobMatches(j,c))}return refJobs(k,id)}
 function dpInfo(k,x){if(k=='gear')return(x.own==='out'?'Outsourced'+(x.sup?' from '+esc(x.sup):'')+' · we pay '+gcLabel(x):'Owned · qty '+x.qty)+' · charge '+m(x.rate)+'/day';
 if(k=='crew'){const r=cRig(x),o=cOp(x);return !r&&!o?'No roles set':r&&o&&cSame(x)?'Rigging & operating · '+m(x.rig)+'/h':[r?'Rigging '+m(x.rig)+'/h':'',o?'Operating '+m(x.op)+'/h':''].filter(Boolean).join(' · ')}
+if(k=='tt')return x.price?'Default price '+m(x.price):'No default price';
 return[x.isCl?'Client':'',x.isVe?'Vendor':'',x.phone,x.email].filter(Boolean).map(esc).join(' · ')||'No details'}
 function doMerge(k,keep,drop){const K=dpItem(k,keep),D=dpItem(k,drop);
 if(k=='gear'){S.jobs.forEach(j=>(j.lines||[]).forEach(l=>{if(l.g==drop)l.g=keep}));K.cats=[...new Set([...(K.cats||[]),...(D.cats||[])])];if(!K.sup&&D.sup)K.sup=D.sup;Object.keys(S.alias).forEach(a=>{const v=S.alias[a];if(v&&v.t=='gear'&&v.id==drop)v.id=keep});S.gear=S.gear.filter(x=>x.id!=drop)}
 else if(k=='crew'){S.jobs.forEach(j=>(j.tasks||[]).forEach(t=>t.assign.forEach(a=>{if(a.c==drop)a.c=keep})));(S.payments||[]).forEach(p=>{if(p.c==drop)p.c=keep});S.crew=S.crew.filter(x=>x.id!=drop)}
+else if(k=='tt'){S.jobs.forEach(j=>(j.tasks||[]).forEach(t=>{if(String(t.name).trim().toLowerCase()==D.name.trim().toLowerCase())t.name=K.name}));if(!(+K.price)&&+D.price)K.price=D.price;S.taskTypes=S.taskTypes.filter(x=>x.id!=drop)}
 else{S.jobs.forEach(j=>{if(jobMatches(j,D)){j.cid=keep;j.client=K.name}});S.gear.forEach(g=>{if(g.sup&&g.sup.trim().toLowerCase()==D.name.trim().toLowerCase())g.sup=K.name});S.jobs.forEach(j=>(j.lines||[]).forEach(l=>{if(l.sup&&l.sup.trim().toLowerCase()==D.name.trim().toLowerCase())l.sup=K.name}));
 K.isCl=K.isCl||D.isCl;K.isVe=K.isVe||D.isVe;['phone','email','notes'].forEach(f=>{if(!K[f]&&D[f])K[f]=D[f]});Object.keys(S.alias).forEach(a=>{const v=S.alias[a];if(v&&v.t=='client'&&v.id==drop)v.id=keep});S.contacts=S.contacts.filter(x=>x.id!=drop)}}
 function mergeGo(){const o=V.pop,drop=o.keep==o.a?o.b:o.a;try{localStorage.setItem('evtapp_premerge',JSON.stringify({t:new Date().toISOString(),s:S}))}catch(e){}
@@ -858,14 +868,14 @@ function mergeIgnore(){const o=V.pop;S.nodup.push(dpKey(o.kind,o.a,o.b));V.pop=n
 function undoMerge(){try{const x=JSON.parse(localStorage.getItem('evtapp_premerge'));S=x.s;S.alias=S.alias||{};S.payments=S.payments||[];S.nodup=S.nodup||[];localStorage.removeItem('evtapp_premerge');V.pop=null;render();toast('Merge undone. Your data is back as it was.',5000)}catch(e){toast('Nothing to undo.')}}
 function mergePopup(top){const o=V.pop,k=o.kind,keep=o.keep,drop=keep==o.a?o.b:o.a,K=dpItem(k,keep),D=dpItem(k,drop);
 if(!K||!D){V.pop=null;return''}
-const what=k=='gear'?'equipment':k=='crew'?'crew member':'contact',jd=dpJobs(k,drop),jdc=jd.filter(j=>!isUp(j)),pays=k=='crew'?PA(drop).length:0;
+const what=k=='gear'?'equipment':k=='crew'?'crew member':k=='tt'?'task type':'contact',jd=dpJobs(k,drop),jdc=jd.filter(j=>!isUp(j)),pays=k=='crew'?PA(drop).length:0;
 const before=closedProfit();let after=before;const sn=JSON.stringify(S);doMerge(k,keep,drop);after=closedProfit();S=JSON.parse(sn);
-const chg=Math.abs(after-before)>0.004,ren=k=='contact'&&jdc.length&&K.name!=D.name,need=chg||ren;
+const chg=Math.abs(after-before)>0.004,ren=(k=='contact'||k=='tt')&&jdc.length&&K.name!=D.name,need=chg||ren;
 const card=(id,x)=>`<div class="card" style="margin:0;cursor:pointer;${keep==id?'border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)':''}" onclick="V.pop.keep=${id};V.pop.ack=false;render()"><div class="row"><b>${esc(x.name)}</b><span>${keep==id?'●':'○'}</span></div><div class="mu" style="margin-top:4px">${dpInfo(k,x)}</div><div class="mu">${dpJobs(k,id).length} job${dpJobs(k,id).length==1?'':'s'}${k=='crew'&&PA(id).length?' · '+PA(id).length+' payment'+(PA(id).length==1?'':'s'):''}</div></div>`;
 return top('Possible duplicate')+`<div class="mu" style="margin-bottom:8px">These two ${what}s look like the same one. Tap the one to <b>keep</b>.</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">${card(o.a,dpItem(k,o.a))}${card(o.b,dpItem(k,o.b))}</div>
-<div class="card" style="margin-bottom:10px"><b>What merging does</b><div class="mu" style="margin-top:4px">“${esc(D.name)}” is removed. ${jd.length?`It is replaced by “${esc(K.name)}” on ${jd.length} job${jd.length==1?'':'s'}${jdc.length?` (${jdc.length} completed)`:''}.`:'No jobs use it.'}${pays?` Its ${pays} payment${pays==1?'':'s'} move${pays==1?'s':''} to “${esc(K.name)}”.`:''} “${esc(K.name)}”'s details are kept${k=='contact'?'; missing phone, email and notes are filled from the other':''}.</div>
-${jdc.length?(chg?`<div style="margin-top:8px;color:var(--bad)"><b>Completed-job profit changes: ${m(before)} → ${m(after)}</b> (${after-before>0?'+':''}${m(after-before)}). Your statistics will change.</div>`:ren?`<div style="margin-top:8px;color:var(--bad)"><b>${jdc.length} completed job${jdc.length==1?'':'s'} will show the name “${esc(K.name)}”</b> instead of “${esc(D.name)}”. Per-client statistics will combine them.</div>`:`<div class="mu" style="margin-top:8px">Completed-job profit stays at ${m(before)}, so statistics are unaffected.</div>`):''}
+<div class="card" style="margin-bottom:10px"><b>What merging does</b><div class="mu" style="margin-top:4px">“${esc(D.name)}” is removed. ${jd.length?`It is replaced by “${esc(K.name)}” on ${jd.length} job${jd.length==1?'':'s'}${jdc.length?` (${jdc.length} completed)`:''}.`:'No jobs use it.'}${pays?` Its ${pays} payment${pays==1?'':'s'} move${pays==1?'s':''} to “${esc(K.name)}”.`:''} “${esc(K.name)}”'s details are kept${k=='contact'?'; missing phone, email and notes are filled from the other':k=='tt'?'; the default price is filled from the other if missing':''}.</div>
+${jdc.length?(chg?`<div style="margin-top:8px;color:var(--bad)"><b>Completed-job profit changes: ${m(before)} → ${m(after)}</b> (${after-before>0?'+':''}${m(after-before)}). Your statistics will change.</div>`:ren?`<div style="margin-top:8px;color:var(--bad)"><b>${jdc.length} completed job${jdc.length==1?'':'s'} will show the name “${esc(K.name)}”</b> instead of “${esc(D.name)}”. ${k=='tt'?'Profit is unchanged; only the task name changes.':'Per-client statistics will combine them.'}</div>`:`<div class="mu" style="margin-top:8px">Completed-job profit stays at ${m(before)}, so statistics are unaffected.</div>`):''}
 ${need?`<label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:14px"><input type="checkbox" style="width:auto" ${o.ack?'checked':''} onchange="V.pop.ack=this.checked;render()">I understand this changes completed jobs</label>`:''}
 <div class="mu" style="margin-top:8px">A safety copy is saved first. You can undo from Menu.</div></div>
 <button class="${need?'dng':'p'}" style="width:100%;margin-bottom:6px" ${need&&!o.ack?'disabled':''} onclick="mergeGo()">Merge into “${esc(K.name)}”</button>
